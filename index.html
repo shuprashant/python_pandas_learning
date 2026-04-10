@@ -1,0 +1,2595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐼 PyData Mastery — Pandas · NumPy · Visualization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #0f1629;
+  --surface: #131929;
+  --surface2: #1a2035;
+  --surface3: #1f2540;
+  --border: #2a3250;
+  --border2: #364060;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #10b981;
+  --accent4: #f59e0b;
+  --accent5: #ef4444;
+  --accent6: #ec4899;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --beginner: #10b981;
+  --intermediate: #f59e0b;
+  --advanced: #ef4444;
+  --numpy: #7c3aed;
+  --viz: #ec4899;
+  --de: #00d4ff;
+  --da: #34d399;
+  --interview: #f97316;
+  --glow: rgba(0,212,255,0.15);
+  --glow2: rgba(124,58,237,0.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* PROGRESS BAR */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent6));z-index:9999;width:0%;transition:width .2s;}
+
+/* TOP NAV */
+#topnav{
+  position:fixed;top:3px;left:0;right:0;height:56px;
+  background:rgba(10,14,26,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:1000;gap:12px;
+}
+.logo{
+  font-family:'Playfair Display',serif;font-size:20px;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  white-space:nowrap;flex-shrink:0;
+}
+.nav-tabs{display:flex;gap:4px;overflow-x:auto;flex:1;justify-content:center;}
+.nav-tabs::-webkit-scrollbar{height:0;}
+.nav-tab{
+  padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid transparent;transition:.2s;white-space:nowrap;
+  color:var(--text2);
+}
+.nav-tab:hover{color:var(--text);background:var(--surface2);}
+.nav-tab.active{color:var(--accent);border-color:var(--accent);background:rgba(0,212,255,.08);}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;flex-shrink:0;}
+.hamburger span{width:22px;height:2px;background:var(--text2);border-radius:2px;transition:.2s;}
+
+/* LAYOUT */
+#layout{display:flex;padding-top:59px;min-height:100vh;}
+
+/* SIDEBAR */
+#sidebar{
+  width:260px;min-width:260px;background:var(--surface);
+  border-right:1px solid var(--border);
+  position:sticky;top:59px;height:calc(100vh - 59px);
+  overflow-y:auto;display:flex;flex-direction:column;
+  transition:transform .25s;
+}
+#sidebar::-webkit-scrollbar{width:3px;}
+.sb-search{padding:12px 14px;border-bottom:1px solid var(--border);}
+.sb-search input{
+  width:100%;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;padding:8px 12px;color:var(--text);
+  font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;
+}
+.sb-search input:focus{border-color:var(--accent);}
+.sb-search input::placeholder{color:var(--text3);}
+.sb-filters{padding:10px 14px;display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+.chip{
+  padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;
+  cursor:pointer;border:1px solid;transition:.2s;font-family:'Space Grotesk',sans-serif;letter-spacing:.3px;
+}
+.chip-all{border-color:var(--text3);color:var(--text3);}
+.chip-all.on{background:var(--text3);color:var(--bg);}
+.chip-b{border-color:var(--beginner);color:var(--beginner);}
+.chip-b.on{background:var(--beginner);color:var(--bg);}
+.chip-i{border-color:var(--intermediate);color:var(--intermediate);}
+.chip-i.on{background:var(--intermediate);color:var(--bg);}
+.chip-a{border-color:var(--advanced);color:var(--advanced);}
+.chip-a.on{background:var(--advanced);color:var(--bg);}
+.chip-np{border-color:var(--numpy);color:var(--numpy);}
+.chip-np.on{background:var(--numpy);color:var(--bg);}
+.chip-viz{border-color:var(--viz);color:var(--viz);}
+.chip-viz.on{background:var(--viz);color:var(--bg);}
+.chip-int{border-color:var(--interview);color:var(--interview);}
+.chip-int.on{background:var(--interview);color:var(--bg);}
+
+.sb-nav{padding:8px 0;}
+.sb-cat{
+  padding:8px 14px 4px;font-size:9px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--text3);margin-top:8px;
+}
+.sb-item{
+  padding:7px 14px;font-size:12.5px;color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.15s;
+  border-left:2px solid transparent;
+}
+.sb-item:hover{color:var(--text);background:var(--surface2);}
+.sb-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--glow);}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:32px 40px 80px;}
+#main::-webkit-scrollbar{width:5px;}
+
+/* HERO BANNER */
+.hero{
+  background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(124,58,237,.08),rgba(236,72,153,.06));
+  border:1px solid var(--border2);border-radius:16px;padding:36px;margin-bottom:40px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%);
+}
+.hero::after{
+  content:'';position:absolute;bottom:-80px;left:20%;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,.1),transparent 70%);
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:36px;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent6));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:10px;line-height:1.15;
+}
+.hero p{color:var(--text2);font-size:14px;line-height:1.7;max-width:680px;margin-bottom:24px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;text-align:center;
+}
+.stat-card .val{font-size:26px;font-weight:800;font-family:'Playfair Display',serif;}
+.stat-card .lbl{font-size:10px;color:var(--text3);margin-top:2px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.learning-path{
+  display:flex;gap:10px;flex-wrap:wrap;
+}
+.lp-badge{
+  display:flex;align-items:center;gap:6px;padding:6px 12px;
+  border-radius:8px;font-size:12px;font-weight:600;border:1px solid;
+}
+
+/* SECTION */
+.section{margin-bottom:56px;animation:fadeUp .35s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-header{
+  display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.sec-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+.sec-info{flex:1;}
+.sec-title{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px;}
+.sec-desc{color:var(--text2);font-size:13.5px;line-height:1.65;}
+.sec-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.badge{
+  padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.4px;
+}
+.badge-beginner{background:rgba(16,185,129,.12);color:var(--beginner);}
+.badge-intermediate{background:rgba(245,158,11,.12);color:var(--intermediate);}
+.badge-advanced{background:rgba(239,68,68,.12);color:var(--advanced);}
+.badge-numpy{background:rgba(124,58,237,.12);color:var(--numpy);}
+.badge-viz{background:rgba(236,72,153,.12);color:var(--viz);}
+.badge-de{background:rgba(0,212,255,.12);color:var(--de);}
+.badge-da{background:rgba(52,211,153,.12);color:var(--da);}
+.badge-interview{background:rgba(249,115,22,.12);color:var(--interview);}
+
+/* CARDS */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:16px;overflow:hidden;
+  transition:border-color .2s;
+}
+.card:hover{border-color:var(--border2);}
+.card-hdr{
+  padding:12px 16px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+}
+.card-title{font-size:14px;font-weight:700;}
+.card-sub{font-size:12px;color:var(--text2);margin-top:3px;}
+.card-tag{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;
+  white-space:nowrap;flex-shrink:0;
+}
+
+/* CODE BLOCK */
+.codeblock{position:relative;background:#080c18;}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text2);padding:4px 10px;border-radius:6px;
+  font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.5px;
+  font-family:'Space Grotesk',sans-serif;transition:.2s;z-index:10;
+}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-btn.done{border-color:var(--accent3);color:var(--accent3);}
+pre{
+  font-family:'Fira Code',monospace;font-size:12.5px;line-height:1.75;
+  padding:18px 16px;overflow-x:auto;white-space:pre;color:var(--text);
+}
+
+/* SYNTAX */
+.kw{color:#f97316;}
+.fn{color:#a78bfa;}
+.str{color:#86efac;}
+.cm{color:#475569;font-style:italic;}
+.num{color:#60a5fa;}
+.cls{color:#fb7185;}
+.op{color:#f97316;}
+.dc{color:#fbbf24;}
+
+/* CALLOUT BOXES */
+.note{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--accent);margin:12px 0;line-height:1.6;}
+.warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--intermediate);margin:12px 0;line-height:1.6;}
+.tip{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--accent3);margin:12px 0;line-height:1.6;}
+.danger{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--accent5);margin:12px 0;line-height:1.6;}
+
+/* INTERVIEW Q&A */
+.qa-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:12px;overflow:hidden;
+  transition:border-color .2s;
+}
+.qa-item:hover{border-color:var(--interview);}
+.qa-q{
+  padding:14px 16px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  font-weight:600;font-size:13.5px;
+}
+.qa-q-text{flex:1;}
+.qa-level{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap;}
+.qa-toggle{color:var(--text3);font-size:18px;transition:.2s;flex-shrink:0;}
+.qa-a{
+  padding:0 16px;max-height:0;overflow:hidden;
+  transition:max-height .35s ease,padding .35s ease;
+  background:var(--bg2);border-top:0px solid var(--border);
+  font-size:13.5px;color:var(--text2);line-height:1.7;
+}
+.qa-a.open{max-height:600px;padding:14px 16px;border-top-width:1px;}
+.qa-a pre{font-size:11.5px;margin-top:10px;}
+.qa-a .codeblock{border-radius:6px;margin-top:10px;overflow:hidden;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+th{background:var(--surface2);padding:10px 12px;text-align:left;border:1px solid var(--border);font-weight:700;color:var(--accent);}
+td{padding:9px 12px;border:1px solid var(--border);color:var(--text2);}
+tr:nth-child(even) td{background:rgba(26,32,53,.5);}
+
+/* MOBILE */
+.mobile-nav-toggle{display:none;}
+.sb-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:899;display:none;}
+.sb-backdrop.on{display:block;}
+
+@media(max-width:900px){
+  .hamburger{display:flex;}
+  #sidebar{
+    position:fixed;top:0;left:0;bottom:0;z-index:900;
+    transform:translateX(-100%);width:280px;
+    padding-top:59px;
+  }
+  #sidebar.open{transform:translateX(0);}
+  #main{padding:24px 16px 60px;}
+  .hero h1{font-size:26px;}
+  .nav-tabs{display:none;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .sec-header{flex-direction:column;}
+  pre{font-size:11px;}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- TOP NAV -->
+<nav id="topnav">
+  <div class="logo">🐼 PyData Mastery</div>
+  <div class="nav-tabs" id="topTabs"></div>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div id="layout">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-search"><input id="sbSearch" type="text" placeholder="🔍 Search topics..." oninput="doSearch(this.value)"></div>
+  <div class="sb-filters" id="sbFilters">
+    <span class="chip chip-all on" data-f="all">All</span>
+    <span class="chip chip-b" data-f="beginner">Beginner</span>
+    <span class="chip chip-i" data-f="intermediate">Medium</span>
+    <span class="chip chip-a" data-f="advanced">Advanced</span>
+    <span class="chip chip-np" data-f="numpy">NumPy</span>
+    <span class="chip chip-viz" data-f="viz">Viz</span>
+    <span class="chip chip-int" data-f="interview">Interview</span>
+  </div>
+  <div class="sb-nav" id="sbNav"></div>
+</aside>
+<div class="sb-backdrop" id="sbBackdrop"></div>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- HERO -->
+<div class="hero">
+  <h1>The Complete PyData Mastery Guide</h1>
+  <p>The only reference you'll ever need — Pandas, NumPy, Data Visualization, and Interview Prep. Beginner to job-ready at 4–5 years experience level. Built by aggregating knowledge from GeeksforGeeks, W3Schools, DataCamp, Coursera, and more.</p>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="val" style="color:var(--accent)">25+</div><div class="lbl">Topic Areas</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--accent2)">250+</div><div class="lbl">Code Examples</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--accent3)">80+</div><div class="lbl">Interview Q&A</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--accent4)">3</div><div class="lbl">Skill Levels</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--accent6)">100%</div><div class="lbl">Free & Complete</div></div>
+  </div>
+  <div class="learning-path">
+    <div class="lp-badge" style="border-color:var(--beginner);color:var(--beginner)">🟢 Foundations → NumPy + Pandas Core</div>
+    <div class="lp-badge" style="border-color:var(--intermediate);color:var(--intermediate)">🟡 Intermediate → Cleaning, Joins, Datetime</div>
+    <div class="lp-badge" style="border-color:var(--advanced);color:var(--advanced)">🔴 Advanced → Window Fns, Pipelines, Viz</div>
+    <div class="lp-badge" style="border-color:var(--interview);color:var(--interview)">🎯 Interview Ready → 80+ Q&A</div>
+  </div>
+</div>
+
+<div id="content"></div>
+
+</main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// DATA — ALL SECTIONS
+// ═══════════════════════════════════════════════════════════════════════
+const S = [
+
+// ─────────────────────────── NUMPY ───────────────────────────
+{id:"numpy_basics",icon:"⚡",title:"NumPy — Arrays & Fundamentals",
+ level:"beginner",tags:["numpy"],cat:"NumPy Core",
+ desc:"NumPy is the backbone of all data science in Python. Master ndarrays, dtypes, shapes, and the essential mathematical foundation that powers Pandas.",
+ cards:[
+{t:"Installation & Imports",d:"Setup and core attributes",c:`<span class="cm"># Install</span>
+pip install numpy
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Create arrays</span>
+a = np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>])            <span class="cm"># 1D</span>
+b = np.array([[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>],[<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>]])         <span class="cm"># 2D</span>
+c = np.zeros((<span class="num">3</span>, <span class="num">4</span>))                   <span class="cm"># 3×4 zeros</span>
+d = np.ones((<span class="num">2</span>, <span class="num">3</span>), dtype=np.float32)  <span class="cm"># custom dtype</span>
+e = np.eye(<span class="num">4</span>)                           <span class="cm"># 4×4 identity matrix</span>
+f = np.full((<span class="num">3</span>,<span class="num">3</span>), <span class="num">7</span>)                  <span class="cm"># fill with 7</span>
+g = np.arange(<span class="num">0</span>, <span class="num">20</span>, <span class="num">2</span>)               <span class="cm"># [0,2,4,...,18]</span>
+h = np.linspace(<span class="num">0</span>, <span class="num">1</span>, <span class="num">100</span>)            <span class="cm"># 100 equally spaced</span>
+i = np.random.rand(<span class="num">3</span>, <span class="num">4</span>)              <span class="cm"># uniform 0-1</span>
+j = np.random.randn(<span class="num">3</span>, <span class="num">4</span>)             <span class="cm"># standard normal</span>
+k = np.random.randint(<span class="num">0</span>, <span class="num">100</span>, (<span class="num">5</span>,<span class="num">5</span>))  <span class="cm"># random ints</span>
+
+<span class="cm"># Key attributes</span>
+a.shape    <span class="cm"># dimensions tuple</span>
+a.ndim     <span class="cm"># number of dimensions</span>
+a.dtype    <span class="cm"># data type (int64, float64...)</span>
+a.size     <span class="cm"># total elements</span>
+a.itemsize <span class="cm"># bytes per element</span>
+a.nbytes   <span class="cm"># total bytes</span>`},
+{t:"Indexing, Slicing & Boolean Masking",d:"Access and filter array elements",c:`<span class="cm"># 1D indexing</span>
+a = np.array([<span class="num">10</span>,<span class="num">20</span>,<span class="num">30</span>,<span class="num">40</span>,<span class="num">50</span>])
+a[<span class="num">0</span>]         <span class="cm"># 10</span>
+a[-<span class="num">1</span>]        <span class="cm"># 50</span>
+a[<span class="num">1</span>:<span class="num">4</span>]       <span class="cm"># [20,30,40]</span>
+a[::<span class="num">2</span>]       <span class="cm"># every 2nd: [10,30,50]</span>
+a[::-<span class="num">1</span>]      <span class="cm"># reversed</span>
+
+<span class="cm"># 2D indexing</span>
+m = np.array([[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>],[<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>],[<span class="num">7</span>,<span class="num">8</span>,<span class="num">9</span>]])
+m[<span class="num">0</span>, <span class="num">1</span>]      <span class="cm"># 2 (row 0, col 1)</span>
+m[<span class="num">1</span>:, :<span class="num">2</span>]    <span class="cm"># rows 1-2, cols 0-1</span>
+m[:, <span class="num">1</span>]      <span class="cm"># column 1 → [2,5,8]</span>
+m[<span class="num">0</span>, :]      <span class="cm"># row 0 → [1,2,3]</span>
+
+<span class="cm"># Boolean masking</span>
+a = np.array([<span class="num">5</span>,<span class="num">12</span>,<span class="num">3</span>,<span class="num">8</span>,<span class="num">15</span>])
+mask = a > <span class="num">7</span>          <span class="cm"># [F, T, F, T, T]</span>
+a[mask]                <span class="cm"># [12, 8, 15]</span>
+a[a % <span class="num">2</span> == <span class="num">0</span>]         <span class="cm"># even numbers</span>
+a[(a > <span class="num">5</span>) & (a < <span class="num">15</span>)] <span class="cm"># between 5 and 15</span>
+
+<span class="cm"># Fancy indexing</span>
+a[[<span class="num">0</span>, <span class="num">2</span>, <span class="num">4</span>]]          <span class="cm"># select specific indices</span>
+m[[<span class="num">0</span>,<span class="num">2</span>], [<span class="num">1</span>,<span class="num">2</span>]]       <span class="cm"># select (0,1) and (2,2)</span>`},
+{t:"Reshaping, Stacking & Splitting",d:"Manipulate array shapes",c:`<span class="cm"># Reshape</span>
+a = np.arange(<span class="num">12</span>)
+a.reshape(<span class="num">3</span>, <span class="num">4</span>)    <span class="cm"># 3 rows × 4 cols</span>
+a.reshape(<span class="num">2</span>, -<span class="num">1</span>)   <span class="cm"># -1 auto-computes cols (6)</span>
+a.reshape(-<span class="num">1</span>, <span class="num">1</span>)   <span class="cm"># column vector (12,1)</span>
+a.flatten()         <span class="cm"># copy, 1D</span>
+a.ravel()           <span class="cm"># view if possible, 1D</span>
+a.T                 <span class="cm"># transpose</span>
+
+<span class="cm"># Stack arrays</span>
+x = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]); y = np.array([<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>])
+np.vstack([x, y])    <span class="cm"># vertical: shape (2,3)</span>
+np.hstack([x, y])    <span class="cm"># horizontal: shape (6,)</span>
+np.column_stack([x, y]) <span class="cm"># shape (3,2)</span>
+np.stack([x, y], axis=<span class="num">0</span>) <span class="cm"># new axis: (2,3)</span>
+np.concatenate([x, y])   <span class="cm"># same as hstack for 1D</span>
+
+<span class="cm"># Split</span>
+np.split(a, <span class="num">3</span>)      <span class="cm"># split into 3 equal parts</span>
+np.vsplit(m, <span class="num">3</span>)     <span class="cm"># vertical split 2D</span>
+np.hsplit(m, <span class="num">3</span>)     <span class="cm"># horizontal split 2D</span>
+
+<span class="cm"># Add/remove dimensions</span>
+a = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])
+a[np.newaxis, :]   <span class="cm"># (1, 3) — add row dim</span>
+a[:, np.newaxis]   <span class="cm"># (3, 1) — add col dim</span>
+np.expand_dims(a, axis=<span class="num">0</span>)
+np.squeeze(a)       <span class="cm"># remove dims of size 1</span>`},
+{t:"Math, Statistics & Universal Functions (ufuncs)",d:"Vectorized math — 100x faster than loops",c:`<span class="cm"># Arithmetic (vectorized — no loops needed!)</span>
+a = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>])
+a + <span class="num">10</span>          <span class="cm"># [11,12,13,14]</span>
+a * <span class="num">2</span>           <span class="cm"># [2,4,6,8]</span>
+a ** <span class="num">2</span>          <span class="cm"># [1,4,9,16]</span>
+np.sqrt(a)      <span class="cm"># square root</span>
+np.log(a)       <span class="cm"># natural log</span>
+np.log10(a)     <span class="cm"># log base 10</span>
+np.log2(a)      <span class="cm"># log base 2</span>
+np.exp(a)       <span class="cm"># e^x</span>
+np.abs(a)       <span class="cm"># absolute value</span>
+np.round(a, <span class="num">2</span>) <span class="cm"># round to 2 dp</span>
+np.floor(a)     <span class="cm"># round down</span>
+np.ceil(a)      <span class="cm"># round up</span>
+
+<span class="cm"># Statistical</span>
+np.sum(a)       <span class="cm"># sum</span>
+np.mean(a)      <span class="cm"># mean</span>
+np.median(a)    <span class="cm"># median</span>
+np.std(a)       <span class="cm"># standard deviation</span>
+np.var(a)       <span class="cm"># variance</span>
+np.min(a), np.max(a)
+np.argmin(a), np.argmax(a)  <span class="cm"># index of min/max</span>
+np.percentile(a, [<span class="num">25</span>,<span class="num">50</span>,<span class="num">75</span>])
+np.cumsum(a)    <span class="cm"># running total</span>
+np.cumprod(a)   <span class="cm"># running product</span>
+np.diff(a)      <span class="cm"># differences between elements</span>
+
+<span class="cm"># 2D axis operations</span>
+m = np.array([[<span class="num">1</span>,<span class="num">2</span>],[<span class="num">3</span>,<span class="num">4</span>]])
+np.sum(m, axis=<span class="num">0</span>)  <span class="cm"># column sums [4,6]</span>
+np.sum(m, axis=<span class="num">1</span>)  <span class="cm"># row sums [3,7]</span>
+np.mean(m, axis=<span class="num">0</span>) <span class="cm"># column means</span>`},
+{t:"Broadcasting — The Secret Power",d:"Operations on arrays of different shapes",c:`<span class="cm"># Broadcasting rules:
+# 1. If shapes differ, prepend 1s to smaller shape
+# 2. Dimensions must be equal OR one of them must be 1</span>
+
+a = np.array([[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>],[<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>]])  <span class="cm"># shape (2,3)</span>
+b = np.array([<span class="num">10</span>,<span class="num">20</span>,<span class="num">30</span>])           <span class="cm"># shape (3,) → broadcasts to (2,3)</span>
+a + b  <span class="cm"># [[11,22,33],[14,25,36]]</span>
+
+<span class="cm"># Column vector × row vector = matrix</span>
+col = np.array([[<span class="num">1</span>],[<span class="num">2</span>],[<span class="num">3</span>]])  <span class="cm"># (3,1)</span>
+row = np.array([<span class="num">10</span>,<span class="num">20</span>,<span class="num">30</span>])    <span class="cm"># (3,) → (1,3)</span>
+col * row  <span class="cm"># outer product: (3,3)</span>
+
+<span class="cm"># Real use case: normalize data (Z-score)</span>
+data = np.random.randn(<span class="num">1000</span>, <span class="num">5</span>)
+means = data.mean(axis=<span class="num">0</span>)  <span class="cm"># shape (5,)</span>
+stds  = data.std(axis=<span class="num">0</span>)   <span class="cm"># shape (5,)</span>
+normalized = (data - means) / stds  <span class="cm"># broadcasts over 1000 rows</span>
+
+<span class="cm"># Real use case: distance matrix</span>
+points = np.random.rand(<span class="num">100</span>, <span class="num">2</span>)  <span class="cm"># 100 2D points</span>
+diff = points[:, np.newaxis, :] - points[np.newaxis, :, :]  <span class="cm"># (100,100,2)</span>
+dist = np.sqrt((diff ** <span class="num">2</span>).sum(axis=-<span class="num">1</span>))  <span class="cm"># (100,100) distance matrix</span>`}
+]},
+
+{id:"numpy_advanced",icon:"🔬",title:"NumPy — Advanced Operations",
+ level:"advanced",tags:["numpy"],cat:"NumPy Core",
+ desc:"Linear algebra, random numbers, structured arrays, memory layout, and performance patterns for serious data engineering.",
+ cards:[
+{t:"Linear Algebra",d:"Matrix ops used in ML and analytics",c:`<span class="cm"># Matrix multiplication</span>
+A = np.array([[<span class="num">1</span>,<span class="num">2</span>],[<span class="num">3</span>,<span class="num">4</span>]])
+B = np.array([[<span class="num">5</span>,<span class="num">6</span>],[<span class="num">7</span>,<span class="num">8</span>]])
+A @ B             <span class="cm"># matrix multiply (Python 3.5+)</span>
+np.dot(A, B)      <span class="cm"># same as @</span>
+np.matmul(A, B)   <span class="cm"># explicit matmul</span>
+
+<span class="cm"># Linear algebra operations</span>
+np.linalg.det(A)           <span class="cm"># determinant</span>
+np.linalg.inv(A)           <span class="cm"># inverse</span>
+np.linalg.transpose(A)     <span class="cm"># same as A.T</span>
+np.linalg.norm(A)          <span class="cm"># Frobenius norm</span>
+np.linalg.norm(A, axis=<span class="num">1</span>) <span class="cm"># row norms</span>
+vals, vecs = np.linalg.eig(A)  <span class="cm"># eigenvalues/vectors</span>
+U, S, Vt = np.linalg.svd(A)   <span class="cm"># SVD decomposition</span>
+np.linalg.solve(A, b)          <span class="cm"># solve Ax=b</span>
+np.trace(A)                    <span class="cm"># sum of diagonal</span>
+np.diag(A)                     <span class="cm"># extract diagonal</span>
+np.diag([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])               <span class="cm"># create diagonal matrix</span>
+
+<span class="cm"># Dot products</span>
+v1 = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])
+v2 = np.array([<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>])
+np.dot(v1, v2)    <span class="cm"># 32 (scalar dot product)</span>
+np.cross(v1, v2)  <span class="cm"># cross product</span>
+np.outer(v1, v2)  <span class="cm"># outer product (3×3 matrix)</span>`},
+{t:"Random Number Generation",d:"Reproducible randomness for data science",c:`<span class="cm"># Seed for reproducibility</span>
+rng = np.random.default_rng(seed=<span class="num">42</span>)  <span class="cm"># modern approach (numpy 1.17+)</span>
+
+<span class="cm"># Distributions</span>
+rng.uniform(<span class="num">0</span>, <span class="num">10</span>, size=(<span class="num">3</span>,<span class="num">4</span>))   <span class="cm"># uniform [0,10]</span>
+rng.normal(<span class="num">0</span>, <span class="num">1</span>, size=<span class="num">1000</span>)     <span class="cm"># standard normal</span>
+rng.normal(mu, sigma, <span class="num">1000</span>)      <span class="cm"># custom normal</span>
+rng.integers(<span class="num">1</span>, <span class="num">100</span>, size=<span class="num">50</span>)   <span class="cm"># random ints [1,100)</span>
+rng.binomial(<span class="num">10</span>, <span class="num">0.5</span>, <span class="num">1000</span>)     <span class="cm"># binomial</span>
+rng.poisson(<span class="num">3.5</span>, <span class="num">1000</span>)          <span class="cm"># poisson</span>
+rng.exponential(<span class="num">2.0</span>, <span class="num">1000</span>)     <span class="cm"># exponential</span>
+rng.choice([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>], <span class="num">10</span>)       <span class="cm"># sample with replacement</span>
+rng.choice(arr, <span class="num">10</span>, replace=<span class="kw">False</span>) <span class="cm"># without replacement</span>
+rng.shuffle(arr)                  <span class="cm"># in-place shuffle</span>
+rng.permutation(arr)              <span class="cm"># shuffled copy</span>
+
+<span class="cm"># Legacy (still widely used)</span>
+np.random.seed(<span class="num">42</span>)
+np.random.rand(<span class="num">3</span>, <span class="num">4</span>)
+np.random.randn(<span class="num">1000</span>)
+np.random.randint(<span class="num">0</span>, <span class="num">100</span>, <span class="num">50</span>)`},
+{t:"Sorting, Searching & Set Operations",d:"Advanced array manipulation",c:`<span class="cm"># Sorting</span>
+a = np.array([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>,<span class="num">9</span>,<span class="num">2</span>])
+np.sort(a)              <span class="cm"># sorted copy</span>
+a.sort()                <span class="cm"># in-place sort</span>
+np.argsort(a)           <span class="cm"># indices that would sort a</span>
+np.sort(m, axis=<span class="num">0</span>)     <span class="cm"># sort each column</span>
+np.sort(m, axis=<span class="num">1</span>)     <span class="cm"># sort each row</span>
+
+<span class="cm"># Searching</span>
+np.where(a > <span class="num">3</span>)                       <span class="cm"># indices where condition</span>
+np.where(a > <span class="num">3</span>, <span class="str">'big'</span>, <span class="str">'small'</span>)       <span class="cm"># conditional select</span>
+np.argmin(a), np.argmax(a)             <span class="cm"># index of min/max</span>
+np.searchsorted(sorted_arr, value)     <span class="cm"># binary search</span>
+
+<span class="cm"># Set operations</span>
+np.unique(a)                           <span class="cm"># unique values</span>
+np.unique(a, return_counts=<span class="kw">True</span>)     <span class="cm"># with counts</span>
+np.intersect1d(a, b)                   <span class="cm"># intersection</span>
+np.union1d(a, b)                       <span class="cm"># union</span>
+np.setdiff1d(a, b)                     <span class="cm"># in a not in b</span>
+np.isin(a, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])                   <span class="cm"># membership test</span>
+
+<span class="cm"># Clip, round, digitize</span>
+np.clip(a, <span class="num">2</span>, <span class="num">8</span>)                        <span class="cm"># clamp values to [2,8]</span>
+np.digitize(a, bins=[<span class="num">0</span>,<span class="num">3</span>,<span class="num">6</span>,<span class="num">9</span>])       <span class="cm"># which bin each value falls in</span>
+np.nan_to_num(a, nan=<span class="num">0.0</span>)             <span class="cm"># replace NaN/inf</span>`},
+{t:"Performance & Memory",d:"Structured arrays, views vs copies, speed tricks",c:`<span class="cm"># Views vs Copies (CRITICAL!)</span>
+a = np.arange(<span class="num">10</span>)
+b = a[<span class="num">2</span>:<span class="num">6</span>]    <span class="cm"># VIEW — shares memory with a!</span>
+b[<span class="num">0</span>] = <span class="num">99</span>     <span class="cm"># also modifies a[2]</span>
+c = a.copy()   <span class="cm"># COPY — safe to modify</span>
+
+<span class="cm"># Check</span>
+np.shares_memory(a, b)  <span class="cm"># True (view)</span>
+np.shares_memory(a, c)  <span class="cm"># False (copy)</span>
+
+<span class="cm"># Contiguous memory layout</span>
+a.flags.c_contiguous   <span class="cm"># C-order (row-major)</span>
+a.flags.f_contiguous   <span class="cm"># Fortran-order (col-major)</span>
+np.ascontiguousarray(a) <span class="cm"># force C-contiguous</span>
+
+<span class="cm"># Structured arrays (like database records)</span>
+dt = np.dtype([(<span class="str">'name'</span>, <span class="str">'U20'</span>), (<span class="str">'age'</span>, <span class="num">np.int32</span>), (<span class="str">'score'</span>, <span class="num">np.float64</span>)])
+records = np.array([(<span class="str">'Alice'</span>, <span class="num">25</span>, <span class="num">95.5</span>), (<span class="str">'Bob'</span>, <span class="num">30</span>, <span class="num">87.2</span>)], dtype=dt)
+records[<span class="str">'name'</span>]   <span class="cm"># access field</span>
+records[records[<span class="str">'age'</span>] > <span class="num">25</span>]  <span class="cm"># filter by field</span>
+
+<span class="cm"># Memmap — process huge files without loading all</span>
+fp = np.memmap(<span class="str">'bigfile.npy'</span>, dtype=<span class="str">'float32'</span>, mode=<span class="str">'r'</span>, shape=(<span class="num">1000000</span>, <span class="num">100</span>))
+
+<span class="cm"># Save/Load</span>
+np.save(<span class="str">'array.npy'</span>, a)
+b = np.load(<span class="str">'array.npy'</span>)
+np.savez(<span class="str">'arrays.npz'</span>, x=a, y=b)  <span class="cm"># multiple arrays</span>
+data = np.load(<span class="str">'arrays.npz'</span>)
+data[<span class="str">'x'</span>], data[<span class="str">'y'</span>]`}
+]},
+
+// ─────────────────────────── PANDAS SETUP ───────────────────────────
+{id:"pd_setup",icon:"🚀",title:"Pandas — Setup & Core Data Structures",
+ level:"beginner",tags:["beginner","de","da"],cat:"Pandas Core",
+ desc:"The two core building blocks: Series (1D) and DataFrame (2D). Understand these deeply and everything else becomes easy.",
+ cards:[
+{t:"Install, Import & Display Options",d:"Standard project setup",c:`pip install pandas numpy
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Check version</span>
+pd.__version__    <span class="cm"># should be 2.x+</span>
+
+<span class="cm"># Display options (put at top of notebook)</span>
+pd.set_option(<span class="str">'display.max_columns'</span>, <span class="kw">None</span>)
+pd.set_option(<span class="str">'display.max_rows'</span>, <span class="num">100</span>)
+pd.set_option(<span class="str">'display.max_colwidth'</span>, <span class="kw">None</span>)
+pd.set_option(<span class="str">'display.float_format'</span>, <span class="str">'{:.4f}'</span>.format)
+pd.set_option(<span class="str">'display.width'</span>, <span class="num">200</span>)
+pd.set_option(<span class="str">'display.precision'</span>, <span class="num">4</span>)
+
+<span class="cm"># Reset all options</span>
+pd.reset_option(<span class="str">'all'</span>)`},
+{t:"Series — 1D Labeled Array",d:"The fundamental building block",c:`<span class="cm"># Create Series — multiple ways</span>
+s1 = pd.Series([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>])
+s2 = pd.Series([<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>], index=[<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>])
+s3 = pd.Series({<span class="str">'a'</span>:<span class="num">1</span>, <span class="str">'b'</span>:<span class="num">2</span>, <span class="str">'c'</span>:<span class="num">3</span>})
+s4 = pd.Series(np.arange(<span class="num">5</span>), name=<span class="str">'numbers'</span>)
+s5 = pd.Series(<span class="num">5</span>, index=range(<span class="num">5</span>))  <span class="cm"># broadcast scalar</span>
+
+<span class="cm"># Core attributes</span>
+s.values      <span class="cm"># underlying numpy array</span>
+s.index       <span class="cm"># Index object</span>
+s.dtype       <span class="cm"># data type</span>
+s.name        <span class="cm"># series name</span>
+s.shape       <span class="cm"># (n,)</span>
+s.size        <span class="cm"># number of elements</span>
+s.nbytes      <span class="cm"># memory usage</span>
+
+<span class="cm"># Access elements</span>
+s[<span class="str">'a'</span>]          <span class="cm"># by label</span>
+s.loc[<span class="str">'a'</span>]      <span class="cm"># explicit label</span>
+s.iloc[<span class="num">0</span>]       <span class="cm"># by position</span>
+s[s > <span class="num">1</span>]        <span class="cm"># boolean filter</span>
+s.at[<span class="str">'a'</span>]       <span class="cm"># fast scalar access by label</span>
+s.iat[<span class="num">0</span>]        <span class="cm"># fast scalar access by position</span>
+
+<span class="cm"># Useful methods</span>
+s.head(<span class="num">3</span>), s.tail(<span class="num">3</span>)
+s.unique()        <span class="cm"># unique values (array)</span>
+s.nunique()       <span class="cm"># count of unique values</span>
+s.value_counts()  <span class="cm"># frequency table</span>
+s.sort_values()
+s.sort_index()
+s.describe()      <span class="cm"># stats summary</span>
+s.isnull().sum()  <span class="cm"># count nulls</span>`},
+{t:"DataFrame — 2D Labeled Table",d:"The primary pandas structure",c:`<span class="cm"># Create DataFrame — multiple ways</span>
+<span class="cm"># From dict (most common)</span>
+df = pd.DataFrame({
+    <span class="str">'name'</span>: [<span class="str">'Alice'</span>, <span class="str">'Bob'</span>, <span class="str">'Charlie'</span>, <span class="str">'Diana'</span>],
+    <span class="str">'age'</span>: [<span class="num">25</span>, <span class="num">30</span>, <span class="num">35</span>, <span class="num">28</span>],
+    <span class="str">'dept'</span>: [<span class="str">'IT'</span>, <span class="str">'HR'</span>, <span class="str">'IT'</span>, <span class="str">'Finance'</span>],
+    <span class="str">'salary'</span>: [<span class="num">70000</span>, <span class="num">65000</span>, <span class="num">80000</span>, <span class="num">72000</span>]
+})
+
+<span class="cm"># From list of dicts</span>
+df = pd.DataFrame([{<span class="str">'a'</span>:<span class="num">1</span>,<span class="str">'b'</span>:<span class="num">2</span>}, {<span class="str">'a'</span>:<span class="num">3</span>,<span class="str">'b'</span>:<span class="num">4</span>}])
+
+<span class="cm"># From NumPy array</span>
+df = pd.DataFrame(np.random.randn(<span class="num">5</span>,<span class="num">3</span>), columns=[<span class="str">'A'</span>,<span class="str">'B'</span>,<span class="str">'C'</span>])
+
+<span class="cm"># Essential exploratory methods</span>
+df.shape          <span class="cm"># (rows, cols)</span>
+df.dtypes         <span class="cm"># column data types</span>
+df.columns        <span class="cm"># column names</span>
+df.index          <span class="cm"># row index</span>
+df.info()         <span class="cm"># summary + memory usage</span>
+df.describe()     <span class="cm"># numeric stats (count,mean,std,quartiles)</span>
+df.describe(include=<span class="str">'all'</span>)  <span class="cm"># all dtypes</span>
+df.head(<span class="num">5</span>)        <span class="cm"># first 5 rows</span>
+df.tail(<span class="num">5</span>)        <span class="cm"># last 5 rows</span>
+df.sample(<span class="num">5</span>)      <span class="cm"># random 5 rows</span>
+df.sample(frac=<span class="num">0.1</span>) <span class="cm"># 10% random sample</span>
+df.memory_usage(deep=<span class="kw">True</span>).sum()  <span class="cm"># total memory in bytes</span>
+df.nunique()      <span class="cm"># unique count per column</span>
+df.value_counts() <span class="cm"># pandas 1.1+ (all cols)</span>`}
+]},
+
+// ─────────────────────────── I/O ───────────────────────────
+{id:"pd_io",icon:"📂",title:"Reading & Writing Data (I/O)",
+ level:"beginner",tags:["beginner","de","da"],cat:"Pandas Core",
+ desc:"Read from and write to CSV, Excel, JSON, SQL, Parquet, Feather, HDF5 and more. Master the parameters that matter in production.",
+ cards:[
+{t:"CSV — Read & Write",d:"Most common flat file format",c:`<span class="cm"># Basic read</span>
+df = pd.read_csv(<span class="str">'data.csv'</span>)
+
+<span class="cm"># Full options</span>
+df = pd.read_csv(<span class="str">'data.csv'</span>,
+    sep=<span class="str">','</span>,              <span class="cm"># delimiter (use sep='\t' for TSV)</span>
+    header=<span class="num">0</span>,            <span class="cm"># row to use as column names</span>
+    names=[<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>], <span class="cm"># override column names</span>
+    index_col=<span class="str">'id'</span>,      <span class="cm"># set column as index</span>
+    usecols=[<span class="str">'col1'</span>,<span class="str">'col2'</span>],  <span class="cm"># load specific columns only</span>
+    dtype={<span class="str">'age'</span>:<span class="str">'int32'</span>, <span class="str">'price'</span>:<span class="str">'float32'</span>},
+    parse_dates=[<span class="str">'created_at'</span>, <span class="str">'updated_at'</span>],
+    nrows=<span class="num">1000</span>,           <span class="cm"># load first N rows only</span>
+    skiprows=<span class="num">2</span>,           <span class="cm"># skip first 2 rows</span>
+    skipfooter=<span class="num">1</span>,         <span class="cm"># skip last row</span>
+    na_values=[<span class="str">'N/A'</span>,<span class="str">'--'</span>,<span class="str">'-'</span>,<span class="str">''</span>,<span class="str">'null'</span>],  <span class="cm"># treat these as NaN</span>
+    keep_default_na=<span class="kw">True</span>,
+    encoding=<span class="str">'utf-8'</span>,     <span class="cm"># or 'latin-1', 'cp1252'</span>
+    chunksize=<span class="num">100_000</span>,   <span class="cm"># return iterator for large files</span>
+    compression=<span class="str">'gzip'</span>,  <span class="cm"># read .csv.gz directly</span>
+    low_memory=<span class="kw">False</span>,    <span class="cm"># avoid mixed type warnings</span>
+    engine=<span class="str">'python'</span>      <span class="cm"># or 'c' (default, faster)</span>
+)
+
+<span class="cm"># Write</span>
+df.to_csv(<span class="str">'out.csv'</span>, index=<span class="kw">False</span>)
+df.to_csv(<span class="str">'out.csv'</span>, sep=<span class="str">'|'</span>, index=<span class="kw">False</span>, float_format=<span class="str">'%.2f'</span>)
+df.to_csv(<span class="str">'out.csv.gz'</span>, compression=<span class="str">'gzip'</span>, index=<span class="kw">False</span>)
+
+<span class="cm"># Read multiple CSVs into one DataFrame (DE pattern)</span>
+<span class="kw">import</span> glob
+df = pd.concat([pd.read_csv(f) <span class="kw">for</span> f <span class="kw">in</span> glob.glob(<span class="str">'data/*.csv'</span>)], ignore_index=<span class="kw">True</span>)`},
+{t:"Excel, JSON, Parquet, Feather, SQL",d:"All important data formats",c:`<span class="cm"># Excel</span>
+df = pd.read_excel(<span class="str">'file.xlsx'</span>, sheet_name=<span class="str">'Sheet1'</span>)
+df = pd.read_excel(<span class="str">'file.xlsx'</span>, sheet_name=<span class="num">0</span>)       <span class="cm"># first sheet</span>
+df = pd.read_excel(<span class="str">'file.xlsx'</span>, sheet_name=<span class="kw">None</span>)    <span class="cm"># dict of all sheets</span>
+df.to_excel(<span class="str">'out.xlsx'</span>, index=<span class="kw">False</span>, sheet_name=<span class="str">'Results'</span>)
+
+<span class="cm"># Write multiple sheets</span>
+<span class="kw">with</span> pd.ExcelWriter(<span class="str">'out.xlsx'</span>) <span class="kw">as</span> writer:
+    df1.to_excel(writer, sheet_name=<span class="str">'Sales'</span>, index=<span class="kw">False</span>)
+    df2.to_excel(writer, sheet_name=<span class="str">'Products'</span>, index=<span class="kw">False</span>)
+
+<span class="cm"># JSON</span>
+df = pd.read_json(<span class="str">'data.json'</span>)
+df = pd.read_json(<span class="str">'data.json'</span>, orient=<span class="str">'records'</span>)  <span class="cm"># list of records</span>
+df = pd.read_json(<span class="str">'api_response.json'</span>, lines=<span class="kw">True</span>) <span class="cm"># NDJSON (one JSON per line)</span>
+df.to_json(<span class="str">'out.json'</span>, orient=<span class="str">'records'</span>, indent=<span class="num">2</span>)
+
+<span class="cm"># Parquet — BEST FORMAT for Data Engineering!</span>
+df = pd.read_parquet(<span class="str">'data.parquet'</span>)
+df = pd.read_parquet(<span class="str">'data.parquet'</span>, columns=[<span class="str">'col1'</span>,<span class="str">'col2'</span>])  <span class="cm"># column pruning</span>
+df.to_parquet(<span class="str">'out.parquet'</span>, index=<span class="kw">False</span>, compression=<span class="str">'snappy'</span>)
+
+<span class="cm"># Feather (fast read/write, great for intermediate files)</span>
+df.to_feather(<span class="str">'data.feather'</span>)
+df = pd.read_feather(<span class="str">'data.feather'</span>)
+
+<span class="cm"># SQL</span>
+<span class="kw">import</span> sqlalchemy
+engine = sqlalchemy.create_engine(<span class="str">'postgresql://user:pass@host:5432/db'</span>)
+df = pd.read_sql(<span class="str">"SELECT * FROM orders LIMIT 1000"</span>, engine)
+df = pd.read_sql_table(<span class="str">'orders'</span>, engine)
+df.to_sql(<span class="str">'cleaned_orders'</span>, engine, if_exists=<span class="str">'replace'</span>, index=<span class="kw">False</span>, chunksize=<span class="num">1000</span>)
+
+<span class="cm"># Read from URL</span>
+df = pd.read_csv(<span class="str">'https://example.com/data.csv'</span>)
+
+<span class="cm"># Clipboard (great for quick copy-paste from browser)</span>
+df = pd.read_clipboard()`}
+]},
+
+// ─────────────────────────── SELECTION ───────────────────────────
+{id:"pd_select",icon:"🎯",title:"Selection & Indexing",
+ level:"beginner",tags:["beginner","de","da"],cat:"Pandas Core",
+ desc:"The most-used pandas skills: loc, iloc, boolean indexing, query, and at/iat for precision selection.",
+ cards:[
+{t:"loc & iloc — Label vs Position",d:"The two most important selectors",c:`<span class="cm"># ── loc — LABEL-based ──────────────────────────</span>
+df.loc[<span class="num">0</span>]                    <span class="cm"># row by index label</span>
+df.loc[[<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>]]           <span class="cm"># multiple rows</span>
+df.loc[<span class="num">0</span>, <span class="str">'name'</span>]           <span class="cm"># single cell</span>
+df.loc[<span class="num">0</span>:<span class="num">5</span>]                 <span class="cm"># rows 0-5 (INCLUSIVE!)</span>
+df.loc[<span class="num">0</span>:<span class="num">5</span>, <span class="str">'name'</span>:<span class="str">'age'</span>]  <span class="cm"># row+col slice</span>
+df.loc[:, [<span class="str">'name'</span>,<span class="str">'age'</span>]]  <span class="cm"># all rows, select cols</span>
+
+<span class="cm"># ── iloc — POSITION-based ─────────────────────</span>
+df.iloc[<span class="num">0</span>]                   <span class="cm"># first row</span>
+df.iloc[-<span class="num">1</span>]                  <span class="cm"># last row</span>
+df.iloc[<span class="num">0</span>, <span class="num">1</span>]               <span class="cm"># row 0, col 1</span>
+df.iloc[<span class="num">0</span>:<span class="num">5</span>, <span class="num">0</span>:<span class="num">3</span>]          <span class="cm"># exclusive end!</span>
+df.iloc[-<span class="num">5</span>:]               <span class="cm"># last 5 rows</span>
+df.iloc[:, [<span class="num">0</span>, <span class="num">2</span>, <span class="num">4</span>]]     <span class="cm"># columns by position</span>
+df.iloc[::2]                <span class="cm"># every other row</span>
+
+<span class="cm"># ── at / iat — FAST scalar access ─────────────</span>
+df.at[<span class="num">0</span>, <span class="str">'name'</span>]            <span class="cm"># label → single value</span>
+df.iat[<span class="num">0</span>, <span class="num">1</span>]               <span class="cm"># position → single value</span>
+df.at[<span class="num">0</span>, <span class="str">'salary'</span>] = <span class="num">75000</span> <span class="cm"># set single value (fast)</span>
+
+<span class="cm"># KEY DIFFERENCE:</span>
+<span class="cm"># loc  → row 0 to 5 = 6 rows (inclusive)</span>
+<span class="cm"># iloc → row 0 to 5 = 5 rows (exclusive end)</span>`},
+{t:"Boolean Filtering & Query",d:"Filter rows by conditions",c:`<span class="cm"># Single condition</span>
+df[df[<span class="str">'age'</span>] > <span class="num">25</span>]
+df[df[<span class="str">'name'</span>] == <span class="str">'Alice'</span>]
+df[df[<span class="str">'salary'</span>].isna()]
+df[df[<span class="str">'salary'</span>].notna()]
+
+<span class="cm"># Multiple conditions (MUST use & | ~ with parentheses)</span>
+df[(df[<span class="str">'age'</span>] > <span class="num">25</span>) & (df[<span class="str">'salary'</span>] > <span class="num">60000</span>)]
+df[(df[<span class="str">'dept'</span>] == <span class="str">'IT'</span>) | (df[<span class="str">'dept'</span>] == <span class="str">'HR'</span>)]
+df[~(df[<span class="str">'status'</span>] == <span class="str">'inactive'</span>)]  <span class="cm"># NOT</span>
+
+<span class="cm"># isin — membership test</span>
+df[df[<span class="str">'dept'</span>].isin([<span class="str">'IT'</span>, <span class="str">'HR'</span>, <span class="str">'Finance'</span>])]
+df[~df[<span class="str">'city'</span>].isin([<span class="str">'Chennai'</span>, <span class="str">'Kolkata'</span>])]
+
+<span class="cm"># between — range filter</span>
+df[df[<span class="str">'age'</span>].between(<span class="num">25</span>, <span class="num">35</span>)]           <span class="cm"># inclusive</span>
+df[df[<span class="str">'date'</span>].between(<span class="str">'2024-01-01'</span>, <span class="str">'2024-12-31'</span>)]
+
+<span class="cm"># query — cleaner syntax for complex filters</span>
+df.query(<span class="str">"age > 25 and salary > 60000"</span>)
+df.query(<span class="str">"dept in ['IT', 'HR']"</span>)
+df.query(<span class="str">"dept != 'Finance' and age < 40"</span>)
+city = <span class="str">'Mumbai'</span>
+df.query(<span class="str">"city == @city"</span>)   <span class="cm"># use Python variable with @</span>
+df.query(<span class="str">"salary > salary.mean()"</span>)  <span class="cm"># use method calls</span>
+
+<span class="cm"># np.where — vectorized conditional (faster than apply)</span>
+df[<span class="str">'tier'</span>] = np.where(df[<span class="str">'salary'</span>] > <span class="num">75000</span>, <span class="str">'Senior'</span>, <span class="str">'Junior'</span>)
+
+<span class="cm"># np.select — multiple conditions</span>
+conditions = [df[<span class="str">'score'</span>] >= <span class="num">90</span>, df[<span class="str">'score'</span>] >= <span class="num">70</span>, df[<span class="str">'score'</span>] >= <span class="num">50</span>]
+choices    = [<span class="str">'A'</span>, <span class="str">'B'</span>, <span class="str">'C'</span>]
+df[<span class="str">'grade'</span>] = np.select(conditions, choices, default=<span class="str">'F'</span>)`}
+]},
+
+// ─────────────────────────── CLEANING ───────────────────────────
+{id:"pd_clean",icon:"🧹",title:"Data Cleaning",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Pandas Core",
+ desc:"Production-grade data quality: nulls, duplicates, type conversions, string cleaning, and memory optimization.",
+ cards:[
+{t:"Missing Values — Detect, Drop, Fill",d:"Handle NaN/None/NaT",c:`<span class="cm"># Detect</span>
+df.isna()                          <span class="cm"># boolean DataFrame</span>
+df.isna().sum()                    <span class="cm"># count per column</span>
+df.isna().sum() / len(df) * <span class="num">100</span>   <span class="cm"># % missing per column</span>
+df.isna().any(axis=<span class="num">1</span>)             <span class="cm"># rows with ANY null</span>
+df.isna().all(axis=<span class="num">1</span>)             <span class="cm"># rows where ALL are null</span>
+df.notna().all()                   <span class="cm"># columns with NO nulls</span>
+
+<span class="cm"># Drop</span>
+df.dropna()                        <span class="cm"># remove rows with ANY null</span>
+df.dropna(subset=[<span class="str">'name'</span>,<span class="str">'email'</span>]) <span class="cm"># only if these cols are null</span>
+df.dropna(how=<span class="str">'all'</span>)              <span class="cm"># only if ALL cols are null</span>
+df.dropna(thresh=<span class="num">3</span>)               <span class="cm"># keep rows with ≥3 non-null</span>
+df.dropna(axis=<span class="num">1</span>)                 <span class="cm"># drop columns with any null</span>
+
+<span class="cm"># Fill</span>
+df.fillna(<span class="num">0</span>)
+df.fillna({<span class="str">'age'</span>: <span class="num">0</span>, <span class="str">'name'</span>: <span class="str">'Unknown'</span>, <span class="str">'salary'</span>: df[<span class="str">'salary'</span>].median()})
+df[<span class="str">'col'</span>].fillna(df[<span class="str">'col'</span>].mean())
+df[<span class="str">'col'</span>].ffill()   <span class="cm"># forward fill (propagate last valid)</span>
+df[<span class="str">'col'</span>].bfill()   <span class="cm"># backward fill</span>
+df[<span class="str">'col'</span>].fillna(method=<span class="str">'ffill'</span>, limit=<span class="num">3</span>)  <span class="cm"># fill max 3 consecutive</span>
+df[<span class="str">'col'</span>].interpolate(method=<span class="str">'linear'</span>)   <span class="cm"># linear interpolation</span>
+df[<span class="str">'col'</span>].interpolate(method=<span class="str">'time'</span>)     <span class="cm"># time-aware interpolation</span>`},
+{t:"Duplicates & Type Conversion",d:"Remove dupes and optimize dtypes",c:`<span class="cm"># Duplicates</span>
+df.duplicated()                        <span class="cm"># True/False per row</span>
+df.duplicated(subset=[<span class="str">'name'</span>,<span class="str">'date'</span>]) <span class="cm"># based on specific cols</span>
+df.duplicated().sum()                  <span class="cm"># count duplicates</span>
+df.drop_duplicates()                   <span class="cm"># keep first occurrence</span>
+df.drop_duplicates(keep=<span class="str">'last'</span>)       <span class="cm"># keep last</span>
+df.drop_duplicates(keep=<span class="kw">False</span>)        <span class="cm"># remove ALL duplicate rows</span>
+df.drop_duplicates(subset=<span class="str">'email'</span>)    <span class="cm"># dedupe on email only</span>
+
+<span class="cm"># Type conversion</span>
+df[<span class="str">'age'</span>] = df[<span class="str">'age'</span>].astype(<span class="str">'int32'</span>)
+df[<span class="str">'price'</span>] = df[<span class="str">'price'</span>].astype(<span class="str">'float32'</span>)
+df[<span class="str">'active'</span>] = df[<span class="str">'active'</span>].astype(<span class="str">'bool'</span>)
+df[<span class="str">'category'</span>] = df[<span class="str">'category'</span>].astype(<span class="str">'category'</span>)  <span class="cm"># ← saves huge memory!</span>
+
+<span class="cm"># Safe conversion — bad values → NaN</span>
+df[<span class="str">'age'</span>] = pd.to_numeric(df[<span class="str">'age'</span>], errors=<span class="str">'coerce'</span>)
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>], errors=<span class="str">'coerce'</span>)
+
+<span class="cm"># Auto memory optimization (DE must-know pattern)</span>
+<span class="kw">def</span> <span class="fn">optimize_df</span>(df):
+    <span class="kw">for</span> c <span class="kw">in</span> df.select_dtypes(<span class="str">'int64'</span>).columns:
+        df[c] = pd.to_numeric(df[c], downcast=<span class="str">'integer'</span>)   <span class="cm"># int64 → int8/16/32</span>
+    <span class="kw">for</span> c <span class="kw">in</span> df.select_dtypes(<span class="str">'float64'</span>).columns:
+        df[c] = pd.to_numeric(df[c], downcast=<span class="str">'float'</span>)     <span class="cm"># float64 → float32</span>
+    <span class="kw">for</span> c <span class="kw">in</span> df.select_dtypes(<span class="str">'object'</span>).columns:
+        <span class="kw">if</span> df[c].nunique() / len(df) < <span class="num">0.5</span>:               <span class="cm"># low cardinality</span>
+            df[c] = df[c].astype(<span class="str">'category'</span>)
+    <span class="kw">return</span> df`},
+{t:"String Cleaning — .str Accessor",d:"Vectorized string operations",c:`<span class="cm"># Basic .str methods</span>
+df[<span class="str">'name'</span>].str.lower()
+df[<span class="str">'name'</span>].str.upper()
+df[<span class="str">'name'</span>].str.title()
+df[<span class="str">'name'</span>].str.strip()         <span class="cm"># remove leading/trailing whitespace</span>
+df[<span class="str">'name'</span>].str.lstrip(<span class="str">'$'</span>)    <span class="cm"># left strip specific chars</span>
+df[<span class="str">'name'</span>].str.replace(<span class="str">'_'</span>, <span class="str">' '</span>)
+df[<span class="str">'name'</span>].str.contains(<span class="str">'manager'</span>, case=<span class="kw">False</span>, na=<span class="kw">False</span>)
+df[<span class="str">'name'</span>].str.startswith(<span class="str">'Dr.'</span>)
+df[<span class="str">'name'</span>].str.endswith(<span class="str">'.com'</span>)
+df[<span class="str">'name'</span>].str.len()
+df[<span class="str">'name'</span>].str[:<span class="num">5</span>]            <span class="cm"># first 5 chars</span>
+df[<span class="str">'name'</span>].str.split(<span class="str">','</span>)      <span class="cm"># split into list</span>
+df[<span class="str">'name'</span>].str.split(<span class="str">','</span>, expand=<span class="kw">True</span>)  <span class="cm"># split into columns</span>
+
+<span class="cm"># Regex</span>
+df[<span class="str">'phone'</span>].str.replace(<span class="str">r'[^0-9]'</span>, <span class="str">''</span>, regex=<span class="kw">True</span>)  <span class="cm"># keep digits only</span>
+df[<span class="str">'amount'</span>].str.replace(<span class="str">r'[\$,₹]'</span>, <span class="str">''</span>, regex=<span class="kw">True</span>).astype(float)
+df[<span class="str">'email'</span>].str.extract(<span class="str">r'@(.+)'</span>)   <span class="cm"># extract domain</span>
+df[<span class="str">'text'</span>].str.extractall(<span class="str">r'(\d+)'</span>) <span class="cm"># all numbers in text</span>
+df[<span class="str">'zip'</span>].str.match(<span class="str">r'^\d{5}$'</span>)    <span class="cm"># validate zip code format</span>
+
+<span class="cm"># Practical cleaning pipeline</span>
+df[<span class="str">'name'</span>] = (df[<span class="str">'name'</span>].str.strip().str.lower()
+             .str.replace(<span class="str">r'\s+'</span>, <span class="str">' '</span>, regex=<span class="kw">True</span>)  <span class="cm"># normalize spaces</span>
+             .str.title())                               <span class="cm"># Title Case</span>
+
+<span class="cm"># Get domain from email</span>
+df[<span class="str">'domain'</span>] = df[<span class="str">'email'</span>].str.split(<span class="str">'@'</span>).str[<span class="num">1</span>]`}
+]},
+
+// ─────────────────────────── TRANSFORMS ───────────────────────────
+{id:"pd_transform",icon:"⚙️",title:"Transformations & New Columns",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Pandas Core",
+ desc:"Apply, map, transform, assign — create, rename, sort, and engineer new features.",
+ cards:[
+{t:"apply, map, transform",d:"Element, row, and group-wise operations",c:`<span class="cm"># map — element-wise on Series (fast)</span>
+df[<span class="str">'grade'</span>] = df[<span class="str">'score'</span>].map({<span class="str">'A'</span>:<span class="num">4</span>, <span class="str">'B'</span>:<span class="num">3</span>, <span class="str">'C'</span>:<span class="num">2</span>, <span class="str">'D'</span>:<span class="num">1</span>})
+df[<span class="str">'tax'</span>] = df[<span class="str">'income'</span>].map(<span class="kw">lambda</span> x: x * <span class="num">0.3</span> <span class="kw">if</span> x > <span class="num">50000</span> <span class="kw">else</span> x * <span class="num">0.2</span>)
+
+<span class="cm"># apply — row or column wise on DataFrame</span>
+df.apply(<span class="kw">lambda</span> x: x.max() - x.min())              <span class="cm"># column range (axis=0)</span>
+df.apply(<span class="kw">lambda</span> row: row[<span class="str">'a'</span>] + row[<span class="str">'b'</span>], axis=<span class="num">1</span>)  <span class="cm"># row-wise (axis=1)</span>
+
+<span class="cm"># transform — like apply but keeps original shape (great for groupby)</span>
+df[<span class="str">'dept_avg'</span>] = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].transform(<span class="str">'mean'</span>)
+df[<span class="str">'z_score'</span>] = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].transform(
+    <span class="kw">lambda</span> x: (x - x.mean()) / x.std()
+)
+
+<span class="cm"># SPEED HIERARCHY (fastest → slowest)</span>
+<span class="cm"># vectorized ops > eval() > np.where > map > apply > itertuples > iterrows</span>
+
+<span class="cm"># np.where — vectorized if-else (ALWAYS prefer over apply)</span>
+df[<span class="str">'tier'</span>] = np.where(df[<span class="str">'salary'</span>] > <span class="num">75000</span>, <span class="str">'Senior'</span>, <span class="str">'Junior'</span>)
+
+<span class="cm"># np.select — multiple conditions (ALWAYS prefer over if/elif chains)</span>
+conds   = [df[<span class="str">'score'</span>] >= <span class="num">90</span>, df[<span class="str">'score'</span>] >= <span class="num">70</span>, df[<span class="str">'score'</span>] >= <span class="num">50</span>]
+choices = [<span class="str">'A'</span>, <span class="str">'B'</span>, <span class="str">'C'</span>]
+df[<span class="str">'grade'</span>] = np.select(conds, choices, default=<span class="str">'F'</span>)
+
+<span class="cm"># pd.cut — bin into labeled ranges</span>
+df[<span class="str">'age_group'</span>] = pd.cut(df[<span class="str">'age'</span>], bins=[<span class="num">0</span>,<span class="num">25</span>,<span class="num">35</span>,<span class="num">45</span>,<span class="num">100</span>],
+                          labels=[<span class="str">'<25'</span>,<span class="str">'25-35'</span>,<span class="str">'35-45'</span>,<span class="str">'45+'</span>])
+<span class="cm"># pd.qcut — equal-frequency bins</span>
+df[<span class="str">'salary_q'</span>] = pd.qcut(df[<span class="str">'salary'</span>], q=<span class="num">4</span>, labels=[<span class="str">'Q1'</span>,<span class="str">'Q2'</span>,<span class="str">'Q3'</span>,<span class="str">'Q4'</span>])`},
+{t:"assign, rename, drop, sort",d:"Column management operations",c:`<span class="cm"># assign — add/transform columns (chainable)</span>
+df = df.assign(
+    bonus    = <span class="kw">lambda</span> x: x[<span class="str">'salary'</span>] * <span class="num">0.1</span>,
+    total    = <span class="kw">lambda</span> x: x[<span class="str">'salary'</span>] + x[<span class="str">'bonus'</span>],  <span class="cm"># can reference new cols!</span>
+    is_senior= <span class="kw">lambda</span> x: x[<span class="str">'age'</span>] >= <span class="num">35</span>
+)
+
+<span class="cm"># Rename columns</span>
+df.rename(columns={<span class="str">'old_name'</span>: <span class="str">'new_name'</span>, <span class="str">'a'</span>: <span class="str">'b'</span>}, inplace=<span class="kw">True</span>)
+df.columns = df.columns.str.lower().str.replace(<span class="str">' '</span>, <span class="str">'_'</span>)  <span class="cm"># clean all at once</span>
+df.columns = [f<span class="str">'col_{i}'</span> <span class="kw">for</span> i, c <span class="kw">in</span> enumerate(df.columns)]
+
+<span class="cm"># Drop</span>
+df.drop(columns=[<span class="str">'col1'</span>, <span class="str">'col2'</span>])
+df.drop(index=[<span class="num">0</span>, <span class="num">5</span>, <span class="num">10</span>])
+df.drop(columns=df.columns[df.isna().all()])  <span class="cm"># drop all-NaN columns</span>
+
+<span class="cm"># Sort</span>
+df.sort_values(<span class="str">'salary'</span>)
+df.sort_values([<span class="str">'dept'</span>, <span class="str">'salary'</span>], ascending=[<span class="kw">True</span>, <span class="kw">False</span>])
+df.sort_values(<span class="str">'salary'</span>, na_position=<span class="str">'first'</span>)  <span class="cm"># NaN goes to top</span>
+df.sort_index()                                  <span class="cm"># sort by index</span>
+df.nlargest(<span class="num">10</span>, <span class="str">'salary'</span>)                       <span class="cm"># top 10 rows</span>
+df.nsmallest(<span class="num">5</span>, <span class="str">'age'</span>)                          <span class="cm"># 5 smallest</span>
+
+<span class="cm"># Reset / Set index</span>
+df.reset_index(drop=<span class="kw">True</span>)
+df.set_index(<span class="str">'id'</span>)
+df.set_index([<span class="str">'year'</span>, <span class="str">'month'</span>])  <span class="cm"># MultiIndex</span>`}
+]},
+
+// ─────────────────────────── GROUPBY ───────────────────────────
+{id:"pd_groupby",icon:"📊",title:"GroupBy & Aggregation",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Analysis",
+ desc:"The most powerful Pandas feature. Master every aggregation pattern from simple counts to complex business metrics.",
+ cards:[
+{t:"GroupBy — All Built-in Aggregations",d:"Every agg function you need to know",c:`g = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>]
+g.sum()       <span class="cm"># total</span>
+g.mean()      <span class="cm"># arithmetic mean</span>
+g.median()    <span class="cm"># median</span>
+g.std()       <span class="cm"># sample std deviation</span>
+g.var()       <span class="cm"># variance</span>
+g.min()       <span class="cm"># minimum value</span>
+g.max()       <span class="cm"># maximum value</span>
+g.count()     <span class="cm"># non-null count</span>
+g.size()      <span class="cm"># total count (including nulls)</span>
+g.nunique()   <span class="cm"># count of distinct values</span>
+g.sem()       <span class="cm"># standard error of mean</span>
+g.skew()      <span class="cm"># skewness</span>
+g.kurt()      <span class="cm"># kurtosis</span>
+g.prod()      <span class="cm"># product</span>
+g.first()     <span class="cm"># first non-null value in group</span>
+g.last()      <span class="cm"># last non-null value</span>
+g.quantile(<span class="num">0.25</span>)  <span class="cm"># Q1</span>
+g.quantile(<span class="num">0.75</span>)  <span class="cm"># Q3</span>
+g.describe()  <span class="cm"># all stats at once</span>
+
+<span class="cm"># Multiple grouping keys</span>
+df.groupby([<span class="str">'dept'</span>, <span class="str">'city'</span>])[<span class="str">'salary'</span>].mean()
+
+<span class="cm"># Named aggregations (preferred modern syntax)</span>
+df.groupby(<span class="str">'dept'</span>).agg(
+    avg_salary   = (<span class="str">'salary'</span>, <span class="str">'mean'</span>),
+    total_salary = (<span class="str">'salary'</span>, <span class="str">'sum'</span>),
+    headcount    = (<span class="str">'name'</span>, <span class="str">'count'</span>),
+    max_age      = (<span class="str">'age'</span>, <span class="str">'max'</span>),
+    unique_cities= (<span class="str">'city'</span>, <span class="str">'nunique'</span>),
+    first_hire   = (<span class="str">'hire_date'</span>, <span class="str">'min'</span>),
+    p90_salary   = (<span class="str">'salary'</span>, <span class="kw">lambda</span> x: x.quantile(<span class="num">0.9</span>))
+).reset_index()`},
+{t:"Advanced GroupBy — filter, transform, apply",d:"Group-level operations",c:`<span class="cm"># filter — keep groups matching condition</span>
+df.groupby(<span class="str">'dept'</span>).filter(<span class="kw">lambda</span> x: x[<span class="str">'salary'</span>].mean() > <span class="num">65000</span>)
+df.groupby(<span class="str">'dept'</span>).filter(<span class="kw">lambda</span> x: len(x) >= <span class="num">5</span>)  <span class="cm"># keep groups with ≥5 rows</span>
+
+<span class="cm"># transform — broadcasts back to original shape</span>
+df[<span class="str">'dept_mean'</span>] = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].transform(<span class="str">'mean'</span>)
+df[<span class="str">'dept_rank'</span>] = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].rank(method=<span class="str">'dense'</span>, ascending=<span class="kw">False</span>)
+df[<span class="str">'pct_of_dept'</span>] = df[<span class="str">'salary'</span>] / df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].transform(<span class="str">'sum'</span>)
+
+<span class="cm"># Top N per group</span>
+top2 = df[df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].rank(method=<span class="str">'dense'</span>, ascending=<span class="kw">False</span>) <= <span class="num">2</span>]
+
+<span class="cm"># get row with max value per group</span>
+idx = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].idxmax()
+top_earners = df.loc[idx]
+
+<span class="cm"># apply — custom function per group</span>
+<span class="kw">def</span> <span class="fn">group_stats</span>(g):
+    <span class="kw">return</span> pd.Series({
+        <span class="str">'mean'</span>: g[<span class="str">'salary'</span>].mean(),
+        <span class="str">'iqr'</span>: g[<span class="str">'salary'</span>].quantile(<span class="num">0.75</span>) - g[<span class="str">'salary'</span>].quantile(<span class="num">0.25</span>),
+        <span class="str">'outliers'</span>: (g[<span class="str">'salary'</span>] > g[<span class="str">'salary'</span>].mean() + <span class="num">2</span> * g[<span class="str">'salary'</span>].std()).sum()
+    })
+df.groupby(<span class="str">'dept'</span>).apply(group_stats).reset_index()
+
+<span class="cm"># Collect values as list / string</span>
+df.groupby(<span class="str">'dept'</span>)[<span class="str">'name'</span>].agg(list)
+df.groupby(<span class="str">'dept'</span>)[<span class="str">'name'</span>].agg(<span class="str">', '</span>.join)
+df.groupby(<span class="str">'order_id'</span>)[<span class="str">'tag'</span>].agg(<span class="kw">lambda</span> x: <span class="str">'|'</span>.join(sorted(x.unique())))`},
+{t:"Pivot Tables & Crosstab",d:"Cross-tabulation and matrix summaries",c:`<span class="cm"># pivot_table — aggregated summary</span>
+pt = df.pivot_table(
+    values=<span class="str">'salary'</span>,
+    index=<span class="str">'dept'</span>,
+    columns=<span class="str">'city'</span>,
+    aggfunc=<span class="str">'mean'</span>,
+    fill_value=<span class="num">0</span>,
+    margins=<span class="kw">True</span>,
+    margins_name=<span class="str">'Total'</span>
+)
+
+<span class="cm"># Multi-value pivot</span>
+pd.pivot_table(df,
+    values=[<span class="str">'salary'</span>, <span class="str">'bonus'</span>],
+    index=[<span class="str">'dept'</span>, <span class="str">'city'</span>],
+    columns=<span class="str">'year'</span>,
+    aggfunc={<span class="str">'salary'</span>:<span class="str">'mean'</span>, <span class="str">'bonus'</span>:<span class="str">'sum'</span>},
+    fill_value=<span class="num">0</span>
+)
+
+<span class="cm"># crosstab — frequency counts</span>
+pd.crosstab(df[<span class="str">'dept'</span>], df[<span class="str">'city'</span>])
+pd.crosstab(df[<span class="str">'dept'</span>], df[<span class="str">'city'</span>], normalize=<span class="str">'index'</span>)  <span class="cm"># row %</span>
+pd.crosstab(df[<span class="str">'dept'</span>], df[<span class="str">'city'</span>], values=df[<span class="str">'salary'</span>], aggfunc=<span class="str">'mean'</span>)
+
+<span class="cm"># Flatten multi-level column index after pivot</span>
+grp = df.groupby(<span class="str">'dept'</span>).agg({<span class="str">'salary'</span>:[<span class="str">'mean'</span>,<span class="str">'sum'</span>], <span class="str">'age'</span>:[<span class="str">'min'</span>,<span class="str">'max'</span>]})
+grp.columns = [<span class="str">'_'</span>.join(c) <span class="kw">for</span> c <span class="kw">in</span> grp.columns]
+grp.reset_index(inplace=<span class="kw">True</span>)`}
+]},
+
+// ─────────────────────────── JOINS ───────────────────────────
+{id:"pd_joins",icon:"🔗",title:"Joins & Merges",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Analysis",
+ desc:"SQL-style joins using merge, concat, and join. Every join type with diagnostic patterns to prevent bad data.",
+ cards:[
+{t:"merge — All Join Types",d:"SQL JOIN equivalent in pandas",c:`<span class="cm"># All join types</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, how=<span class="str">'inner'</span>)  <span class="cm"># matching rows only</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, how=<span class="str">'left'</span>)   <span class="cm"># all left rows</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, how=<span class="str">'right'</span>)  <span class="cm"># all right rows</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, how=<span class="str">'outer'</span>)  <span class="cm"># all from both</span>
+pd.merge(df1, df2, how=<span class="str">'cross'</span>)            <span class="cm"># cartesian product</span>
+
+<span class="cm"># Different column names</span>
+pd.merge(orders, customers, left_on=<span class="str">'cust_id'</span>, right_on=<span class="str">'id'</span>)
+
+<span class="cm"># Multiple keys</span>
+pd.merge(df1, df2, on=[<span class="str">'year'</span>, <span class="str">'month'</span>, <span class="str">'region'</span>])
+
+<span class="cm"># Duplicate column names → suffixes</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, suffixes=(<span class="str">'_l'</span>, <span class="str">'_r'</span>))
+
+<span class="cm"># ANTI-JOIN — rows in left NOT in right</span>
+m = pd.merge(df1, df2, on=<span class="str">'id'</span>, how=<span class="str">'left'</span>, indicator=<span class="kw">True</span>)
+anti = m[m[<span class="str">'_merge'</span>] == <span class="str">'left_only'</span>].drop(<span class="str">'_merge'</span>, axis=<span class="num">1</span>)
+
+<span class="cm"># SEMI-JOIN — rows in left that EXIST in right (no right cols)</span>
+semi = df1[df1[<span class="str">'id'</span>].isin(df2[<span class="str">'id'</span>])]
+
+<span class="cm"># validate — catch bad join cardinality</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, validate=<span class="str">'1:1'</span>)   <span class="cm"># raises if not one-to-one</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, validate=<span class="str">'1:m'</span>)   <span class="cm"># one-to-many</span>
+pd.merge(df1, df2, on=<span class="str">'id'</span>, validate=<span class="str">'m:1'</span>)   <span class="cm"># many-to-one</span>
+
+<span class="cm"># Detect fan-out (row multiplication bug)</span>
+before = len(df1)
+result = pd.merge(df1, df2, on=<span class="str">'id'</span>)
+<span class="kw">if</span> len(result) > before:
+    <span class="fn">print</span>(<span class="str">f"⚠️ Fan-out: {before} → {len(result)} rows. Check df2 for duplicate ids."</span>)`},
+{t:"concat & asof_merge",d:"Stacking and time-based joins",c:`<span class="cm"># Vertical stack (append rows)</span>
+pd.concat([df1, df2, df3], ignore_index=<span class="kw">True</span>)
+pd.concat([df1, df2], ignore_index=<span class="kw">True</span>, sort=<span class="kw">False</span>)
+
+<span class="cm"># Horizontal stack (side by side)</span>
+pd.concat([df1, df2], axis=<span class="num">1</span>)
+
+<span class="cm"># With source labels</span>
+pd.concat({<span class="str">'jan'</span>: df_jan, <span class="str">'feb'</span>: df_feb}, names=[<span class="str">'month'</span>])
+
+<span class="cm"># combine_first — fill nulls with another df</span>
+df1.combine_first(df2)  <span class="cm"># df2 fills where df1 is NaN</span>
+
+<span class="cm"># merge_asof — nearest key join (great for time series!)</span>
+<span class="cm"># Match each trade to most recent quote</span>
+pd.merge_asof(
+    trades.sort_values(<span class="str">'time'</span>),
+    quotes.sort_values(<span class="str">'time'</span>),
+    on=<span class="str">'time'</span>,
+    by=<span class="str">'ticker'</span>,          <span class="cm"># also match on ticker</span>
+    direction=<span class="str">'backward'</span>  <span class="cm"># use most recent quote ≤ trade time</span>
+)
+
+<span class="cm"># merge_ordered — ordered merge with forward fill</span>
+pd.merge_ordered(df1, df2, on=<span class="str">'date'</span>, fill_method=<span class="str">'ffill'</span>)`}
+]},
+
+// ─────────────────────────── DATETIME ───────────────────────────
+{id:"pd_datetime",icon:"📅",title:"DateTime Operations",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Analysis",
+ desc:"Parse, extract, resample, rolling windows — time series is at the heart of DE and analytics work.",
+ cards:[
+{t:"Parsing & .dt Accessor",d:"Convert strings and extract components",c:`<span class="cm"># Parse datetime</span>
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>])
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>], format=<span class="str">'%Y-%m-%d'</span>)
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>], format=<span class="str">'%d/%m/%Y'</span>, errors=<span class="str">'coerce'</span>)
+df[<span class="str">'date'</span>] = pd.to_datetime(df[<span class="str">'date'</span>], utc=<span class="kw">True</span>)
+
+<span class="cm"># .dt accessor — extract components</span>
+df[<span class="str">'year'</span>]         = df[<span class="str">'date'</span>].dt.year
+df[<span class="str">'month'</span>]        = df[<span class="str">'date'</span>].dt.month
+df[<span class="str">'day'</span>]          = df[<span class="str">'date'</span>].dt.day
+df[<span class="str">'hour'</span>]         = df[<span class="str">'date'</span>].dt.hour
+df[<span class="str">'minute'</span>]       = df[<span class="str">'date'</span>].dt.minute
+df[<span class="str">'weekday'</span>]      = df[<span class="str">'date'</span>].dt.dayofweek  <span class="cm"># 0=Mon, 6=Sun</span>
+df[<span class="str">'weekday_name'</span>] = df[<span class="str">'date'</span>].dt.day_name()
+df[<span class="str">'quarter'</span>]      = df[<span class="str">'date'</span>].dt.quarter
+df[<span class="str">'week'</span>]         = df[<span class="str">'date'</span>].dt.isocalendar().week
+df[<span class="str">'is_weekend'</span>]   = df[<span class="str">'date'</span>].dt.dayofweek >= <span class="num">5</span>
+df[<span class="str">'is_month_end'</span>] = df[<span class="str">'date'</span>].dt.is_month_end
+df[<span class="str">'is_month_start'</span>] = df[<span class="str">'date'</span>].dt.is_month_start
+df[<span class="str">'month_str'</span>]    = df[<span class="str">'date'</span>].dt.strftime(<span class="str">'%B %Y'</span>)
+df[<span class="str">'days_in_month'</span>]= df[<span class="str">'date'</span>].dt.days_in_month
+
+<span class="cm"># Timedelta</span>
+df[<span class="str">'tenure_days'</span>] = (pd.Timestamp.now() - df[<span class="str">'hire_date'</span>]).dt.days
+df[<span class="str">'tenure_yrs'</span>] = df[<span class="str">'tenure_days'</span>] / <span class="num">365.25</span>`},
+{t:"Time Series — Resample, Rolling, Shift",d:"Time-series analytics",c:`<span class="cm"># Date ranges</span>
+pd.date_range(<span class="str">'2024-01-01'</span>, periods=<span class="num">365</span>, freq=<span class="str">'D'</span>)
+pd.date_range(<span class="str">'2024-01-01'</span>, <span class="str">'2024-12-31'</span>, freq=<span class="str">'ME'</span>)  <span class="cm"># month end</span>
+pd.date_range(<span class="str">'2024-01-01'</span>, periods=<span class="num">52</span>, freq=<span class="str">'W-MON'</span>)   <span class="cm"># weekly Mondays</span>
+
+<span class="cm"># Resample — aggregate by time period</span>
+df = df.set_index(<span class="str">'date'</span>)
+df.resample(<span class="str">'D'</span>)[<span class="str">'sales'</span>].sum()    <span class="cm"># daily sum</span>
+df.resample(<span class="str">'W'</span>)[<span class="str">'sales'</span>].mean()   <span class="cm"># weekly avg</span>
+df.resample(<span class="str">'ME'</span>)[<span class="str">'sales'</span>].sum()  <span class="cm"># monthly sum (ME = month end)</span>
+df.resample(<span class="str">'QE'</span>)[<span class="str">'sales'</span>].agg([<span class="str">'sum'</span>,<span class="str">'mean'</span>,<span class="str">'std'</span>])
+df.resample(<span class="str">'YE'</span>)[<span class="str">'sales'</span>].sum()  <span class="cm"># yearly sum</span>
+
+<span class="cm"># Rolling windows</span>
+df[<span class="str">'7d_avg'</span>]  = df[<span class="str">'sales'</span>].rolling(window=<span class="num">7</span>).mean()
+df[<span class="str">'30d_sum'</span>] = df[<span class="str">'sales'</span>].rolling(window=<span class="num">30</span>).sum()
+df[<span class="str">'7d_std'</span>]  = df[<span class="str">'sales'</span>].rolling(window=<span class="num">7</span>).std()
+df[<span class="str">'7d_min_periods'</span>] = df[<span class="str">'sales'</span>].rolling(window=<span class="num">7</span>, min_periods=<span class="num">1</span>).mean()
+
+<span class="cm"># Expanding windows (all data up to current point)</span>
+df[<span class="str">'cum_avg'</span>] = df[<span class="str">'sales'</span>].expanding().mean()
+df[<span class="str">'cum_max'</span>] = df[<span class="str">'sales'</span>].expanding().max()
+
+<span class="cm"># EWM — exponentially weighted mean</span>
+df[<span class="str">'ewm_7'</span>] = df[<span class="str">'sales'</span>].ewm(span=<span class="num">7</span>, adjust=<span class="kw">False</span>).mean()
+
+<span class="cm"># Shift — lag/lead</span>
+df[<span class="str">'prev_month'</span>] = df[<span class="str">'sales'</span>].shift(<span class="num">1</span>)    <span class="cm"># lag 1</span>
+df[<span class="str">'next_month'</span>] = df[<span class="str">'sales'</span>].shift(-<span class="num">1</span>)   <span class="cm"># lead 1</span>
+df[<span class="str">'mom_pct'</span>] = df[<span class="str">'sales'</span>].pct_change()     <span class="cm"># MoM growth %</span>
+df[<span class="str">'yoy_pct'</span>] = df[<span class="str">'sales'</span>].pct_change(<span class="num">12</span>)  <span class="cm"># YoY growth % (monthly data)</span>
+
+<span class="cm"># Timezone</span>
+df[<span class="str">'date'</span>].dt.tz_localize(<span class="str">'UTC'</span>)
+df[<span class="str">'date'</span>].dt.tz_convert(<span class="str">'Asia/Kolkata'</span>)
+df[<span class="str">'date'</span>].dt.tz_convert(<span class="str">'US/Eastern'</span>)`}
+]},
+
+// ─────────────────────────── RESHAPE ───────────────────────────
+{id:"pd_reshape",icon:"🔄",title:"Reshaping Data",
+ level:"intermediate",tags:["intermediate","de","da"],cat:"Analysis",
+ desc:"Wide ↔ Long transformations. Pivot, melt, stack, unstack, and explode — reshaping is critical for reporting and modeling.",
+ cards:[
+{t:"pivot, melt, stack, explode",d:"All reshaping operations",c:`<span class="cm"># pivot — long to wide</span>
+df.pivot(index=<span class="str">'date'</span>, columns=<span class="str">'product'</span>, values=<span class="str">'sales'</span>)
+
+<span class="cm"># melt — wide to long (unpivot)</span>
+df.melt(
+    id_vars=[<span class="str">'id'</span>, <span class="str">'name'</span>],
+    value_vars=[<span class="str">'jan_sales'</span>, <span class="str">'feb_sales'</span>, <span class="str">'mar_sales'</span>],
+    var_name=<span class="str">'month'</span>,
+    value_name=<span class="str">'sales'</span>
+)
+
+<span class="cm"># stack — move column level to row level</span>
+df.stack()      <span class="cm"># innermost col level → row level</span>
+df.unstack()    <span class="cm"># innermost row level → col level</span>
+
+<span class="cm"># explode — list column → multiple rows</span>
+df[<span class="str">'tags'</span>] = df[<span class="str">'tags_str'</span>].str.split(<span class="str">','</span>)
+df.explode(<span class="str">'tags'</span>).reset_index(drop=<span class="kw">True</span>)
+
+<span class="cm"># pd.wide_to_long — structured wide to long</span>
+pd.wide_to_long(df,
+    stubnames=[<span class="str">'sales'</span>, <span class="str">'cost'</span>],
+    i=<span class="str">'id'</span>,
+    j=<span class="str">'year'</span>,
+    sep=<span class="str">'_'</span>
+)
+
+<span class="cm"># Normalize nested JSON → DataFrame</span>
+<span class="kw">from</span> pandas <span class="kw">import</span> json_normalize
+df = pd.json_normalize(json_data, record_path=<span class="str">'orders'</span>, meta=[<span class="str">'customer_id'</span>])`}
+]},
+
+// ─────────────────────────── WINDOW FUNCTIONS ───────────────────────────
+{id:"pd_window",icon:"🪟",title:"Window Functions",
+ level:"advanced",tags:["advanced","de","da"],cat:"Advanced",
+ desc:"SQL window function equivalents: RANK, DENSE_RANK, LAG, LEAD, NTILE, FIRST_VALUE, LAST_VALUE — all in pandas.",
+ cards:[
+{t:"Rank, Cumulative, Running Totals",d:"SQL window function equivalents",c:`<span class="cm"># rank — mimics SQL RANK variants</span>
+df[<span class="str">'rank'</span>]       = df[<span class="str">'salary'</span>].rank()                     <span class="cm"># avg for ties</span>
+df[<span class="str">'rank_min'</span>]   = df[<span class="str">'salary'</span>].rank(method=<span class="str">'min'</span>)          <span class="cm"># SQL RANK()</span>
+df[<span class="str">'rank_dense'</span>] = df[<span class="str">'salary'</span>].rank(method=<span class="str">'dense'</span>)        <span class="cm"># SQL DENSE_RANK()</span>
+df[<span class="str">'row_num'</span>]    = df[<span class="str">'salary'</span>].rank(method=<span class="str">'first'</span>)        <span class="cm"># SQL ROW_NUMBER()</span>
+df[<span class="str">'pct_rank'</span>]  = df[<span class="str">'salary'</span>].rank(pct=<span class="kw">True</span>)             <span class="cm"># SQL PERCENT_RANK()</span>
+
+<span class="cm"># Rank WITHIN groups (PARTITION BY dept)</span>
+df[<span class="str">'dept_rank'</span>] = df.groupby(<span class="str">'dept'</span>)[<span class="str">'salary'</span>].rank(method=<span class="str">'dense'</span>, ascending=<span class="kw">False</span>)
+
+<span class="cm"># NTILE(4) — divide into 4 equal buckets</span>
+df[<span class="str">'quartile'</span>] = pd.qcut(df[<span class="str">'salary'</span>].rank(method=<span class="str">'first'</span>),
+                          q=<span class="num">4</span>, labels=[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>]).astype(int)
+
+<span class="cm"># Cumulative window functions</span>
+df[<span class="str">'cum_sum'</span>]  = df[<span class="str">'sales'</span>].cumsum()
+df[<span class="str">'cum_max'</span>]  = df[<span class="str">'sales'</span>].cummax()
+df[<span class="str">'cum_min'</span>]  = df[<span class="str">'sales'</span>].cummin()
+df[<span class="str">'cum_pct'</span>]  = df[<span class="str">'sales'</span>].cumsum() / df[<span class="str">'sales'</span>].sum() * <span class="num">100</span>  <span class="cm"># Pareto %</span>
+
+<span class="cm"># LAG / LEAD</span>
+df[<span class="str">'lag_1'</span>]    = df[<span class="str">'sales'</span>].shift(<span class="num">1</span>)
+df[<span class="str">'lead_1'</span>]   = df[<span class="str">'sales'</span>].shift(-<span class="num">1</span>)
+df[<span class="str">'lag_grp'</span>]  = df.groupby(<span class="str">'region'</span>)[<span class="str">'sales'</span>].shift(<span class="num">1</span>)  <span class="cm"># LAG WITHIN group</span>
+
+<span class="cm"># FIRST_VALUE / LAST_VALUE per group</span>
+df[<span class="str">'first_sale'</span>] = df.sort_values(<span class="str">'date'</span>).groupby(<span class="str">'dept'</span>)[<span class="str">'sales'</span>].transform(<span class="str">'first'</span>)
+df[<span class="str">'last_sale'</span>]  = df.sort_values(<span class="str">'date'</span>).groupby(<span class="str">'dept'</span>)[<span class="str">'sales'</span>].transform(<span class="str">'last'</span>)`},
+{t:"Bollinger Bands & Outlier Detection",d:"Production rolling window patterns",c:`<span class="cm"># Bollinger Bands (finance)</span>
+window = <span class="num">20</span>
+df[<span class="str">'mid'</span>]   = df[<span class="str">'close'</span>].rolling(window).mean()
+df[<span class="str">'upper'</span>] = df[<span class="str">'mid'</span>] + <span class="num">2</span> * df[<span class="str">'close'</span>].rolling(window).std()
+df[<span class="str">'lower'</span>] = df[<span class="str">'mid'</span>] - <span class="num">2</span> * df[<span class="str">'close'</span>].rolling(window).std()
+df[<span class="str">'signal'</span>] = np.where(df[<span class="str">'close'</span>] > df[<span class="str">'upper'</span>], <span class="str">'sell'</span>,
+             np.where(df[<span class="str">'close'</span>] < df[<span class="str">'lower'</span>], <span class="str">'buy'</span>, <span class="str">'hold'</span>))
+
+<span class="cm"># IQR outlier detection with rolling window</span>
+roll = df[<span class="str">'sales'</span>].rolling(<span class="num">30</span>, center=<span class="kw">True</span>)
+df[<span class="str">'is_outlier'</span>] = (df[<span class="str">'sales'</span>] - roll.mean()).abs() > <span class="num">3</span> * roll.std()
+
+<span class="cm"># Multiple rolling stats at once (efficient)</span>
+roll = df[<span class="str">'sales'</span>].rolling(<span class="num">7</span>)
+stats = pd.concat([
+    roll.mean().rename(<span class="str">'r7_mean'</span>),
+    roll.std().rename(<span class="str">'r7_std'</span>),
+    roll.min().rename(<span class="str">'r7_min'</span>),
+    roll.max().rename(<span class="str">'r7_max'</span>),
+], axis=<span class="num">1</span>)
+df = pd.concat([df, stats], axis=<span class="num">1</span>)
+
+<span class="cm"># Rolling within groups</span>
+df[<span class="str">'rolling_avg'</span>] = (
+    df.sort_values([<span class="str">'region'</span>, <span class="str">'date'</span>])
+      .groupby(<span class="str">'region'</span>)[<span class="str">'sales'</span>]
+      .transform(<span class="kw">lambda</span> x: x.rolling(<span class="num">7</span>, min_periods=<span class="num">1</span>).mean())
+)
+
+<span class="cm"># Year-over-year comparison</span>
+monthly = df.resample(<span class="str">'ME'</span>)[<span class="str">'revenue'</span>].sum()
+yoy = monthly.pct_change(<span class="num">12</span>) * <span class="num">100</span>  <span class="cm"># 12 months ago</span>`}
+]},
+
+// ─────────────────────────── PERFORMANCE ───────────────────────────
+{id:"pd_perf",icon:"⚡",title:"Performance Optimization",
+ level:"advanced",tags:["advanced","de"],cat:"Advanced",
+ desc:"Write production-grade, high-performance pandas. Vectorization, chunking, eval/query, memory tuning, and PyArrow backend.",
+ cards:[
+{t:"Vectorization — Never Write Loops",d:"10-100x performance improvements",c:`<span class="cm"># ❌ SLOW — never do this</span>
+results = []
+<span class="kw">for</span> i, row <span class="kw">in</span> df.iterrows():
+    results.append(row[<span class="str">'price'</span>] * row[<span class="str">'qty'</span>] * (<span class="num">1</span> - row[<span class="str">'discount'</span>]))
+df[<span class="str">'total'</span>] = results
+
+<span class="cm"># ✅ FAST — vectorized (100x faster)</span>
+df[<span class="str">'total'</span>] = df[<span class="str">'price'</span>] * df[<span class="str">'qty'</span>] * (<span class="num">1</span> - df[<span class="str">'discount'</span>])
+
+<span class="cm"># ❌ SLOW — iterrows (bad for large data)</span>
+<span class="kw">for</span> i, row <span class="kw">in</span> df.iterrows(): ...
+
+<span class="cm"># ✅ FASTER — itertuples (5x faster than iterrows)</span>
+<span class="kw">for</span> row <span class="kw">in</span> df.itertuples():
+    _ = row.price * row.qty
+
+<span class="cm"># ✅ FASTEST — vectorized / numpy ops</span>
+df[<span class="str">'log_price'</span>] = np.log1p(df[<span class="str">'price'</span>])
+df[<span class="str">'abs_val'</span>]   = np.abs(df[<span class="str">'value'</span>])
+
+<span class="cm"># eval() — fastest for large DataFrames (uses numexpr)</span>
+df.eval(<span class="str">'gross = price * qty'</span>, inplace=<span class="kw">True</span>)
+df.eval(<span class="str">'net = gross * (1 - discount_rate)'</span>, inplace=<span class="kw">True</span>)
+result = df.eval(<span class="str">'(price - cost) / price * 100'</span>)
+
+<span class="cm"># query() — fast filtering on large DataFrames</span>
+df.query(<span class="str">"dept == 'IT' and salary > 70000"</span>)
+
+<span class="cm"># Avoid chained indexing (SettingWithCopyWarning)</span>
+df[<span class="str">'col'</span>][df[<span class="str">'age'</span>] > <span class="num">30</span>] = <span class="num">0</span>              <span class="cm"># ❌ BAD</span>
+df.loc[df[<span class="str">'age'</span>] > <span class="num">30</span>, <span class="str">'col'</span>] = <span class="num">0</span>          <span class="cm"># ✅ GOOD</span>`},
+{t:"Chunked Processing & Memory",d:"Handle files bigger than RAM",c:`<span class="cm"># Process huge CSV in chunks</span>
+results = []
+<span class="kw">for</span> chunk <span class="kw">in</span> pd.read_csv(<span class="str">'huge.csv'</span>, chunksize=<span class="num">100_000</span>):
+    chunk = chunk[chunk[<span class="str">'status'</span>] == <span class="str">'active'</span>]
+    chunk[<span class="str">'tax'</span>] = chunk[<span class="str">'income'</span>] * <span class="num">0.3</span>
+    results.append(chunk.groupby(<span class="str">'region'</span>)[<span class="str">'tax'</span>].sum())
+final = pd.concat(results).groupby(level=<span class="num">0</span>).sum()
+
+<span class="cm"># Memory usage</span>
+df.memory_usage(deep=<span class="kw">True</span>).sum() / <span class="num">1e6</span>  <span class="cm"># total MB</span>
+df.memory_usage(deep=<span class="kw">True</span>) / <span class="num">1e3</span>       <span class="cm"># per column KB</span>
+
+<span class="cm"># Category dtype → massive memory savings for string cols</span>
+df[<span class="str">'country'</span>] = df[<span class="str">'country'</span>].astype(<span class="str">'category'</span>)  <span class="cm"># up to 10x smaller</span>
+df[<span class="str">'dept'</span>]    = df[<span class="str">'dept'</span>].astype(<span class="str">'category'</span>)
+
+<span class="cm"># PyArrow backend (Pandas 2.0+) — faster + more memory efficient</span>
+df = pd.read_csv(<span class="str">'data.csv'</span>, dtype_backend=<span class="str">'pyarrow'</span>, engine=<span class="str">'pyarrow'</span>)
+
+<span class="cm"># Parquet is 5-10x smaller and faster than CSV</span>
+df.to_parquet(<span class="str">'data.parquet'</span>, compression=<span class="str">'snappy'</span>)
+pd.read_parquet(<span class="str">'data.parquet'</span>, columns=[<span class="str">'id'</span>,<span class="str">'sales'</span>])  <span class="cm"># column pruning
+
+# Copy vs View</span>
+df2 = df.copy()           <span class="cm"># deep copy — safe to modify</span>
+df2 = df[cols].copy()     <span class="cm"># slice copy</span>
+df2 = df                  <span class="cm"># ❌ same object! modifications affect df</span>`}
+]},
+
+// ─────────────────────────── MULTIINDEX ───────────────────────────
+{id:"pd_multiindex",icon:"🏗️",title:"MultiIndex & Method Chaining",
+ level:"advanced",tags:["advanced","de","da"],cat:"Advanced",
+ desc:"Hierarchical indexing, pipe-based pipelines, and production-grade ETL patterns in pure pandas.",
+ cards:[
+{t:"MultiIndex — Hierarchical Data",d:"Working with multi-level indexes",c:`<span class="cm"># Create from groupby</span>
+multi = df.groupby([<span class="str">'dept'</span>, <span class="str">'city'</span>])[<span class="str">'salary'</span>].mean()
+<span class="cm"># dept    city
+# Finance Delhi    72000
+#         Mumbai   75000
+# IT      Delhi    78000
+#         Mumbai   82000</span>
+
+<span class="cm"># Access MultiIndex</span>
+multi[<span class="str">'IT'</span>]                      <span class="cm"># all IT</span>
+multi[(<span class="str">'IT'</span>, <span class="str">'Mumbai'</span>)]          <span class="cm"># specific</span>
+multi.loc[(<span class="str">'IT'</span>, <span class="str">'Mumbai'</span>)]
+multi.loc[pd.IndexSlice[<span class="str">'IT'</span>:, :]]   <span class="cm"># all cities for IT and after</span>
+
+<span class="cm"># xs — cross-section (slice one level)</span>
+multi.xs(<span class="str">'Mumbai'</span>, level=<span class="str">'city'</span>)  <span class="cm"># all depts in Mumbai</span>
+
+<span class="cm"># Flatten to regular DataFrame</span>
+multi.reset_index()
+multi.unstack()                   <span class="cm"># city → columns</span>
+
+<span class="cm"># Flatten multi-level column names</span>
+df.columns = [<span class="str">'_'</span>.join(col).strip() <span class="kw">for</span> col <span class="kw">in</span> df.columns]
+
+<span class="cm"># Create explicitly</span>
+idx = pd.MultiIndex.from_tuples([(<span class="str">'A'</span>,<span class="str">'x'</span>),(<span class="str">'A'</span>,<span class="str">'y'</span>),(<span class="str">'B'</span>,<span class="str">'x'</span>)], names=[<span class="str">'g1'</span>,<span class="str">'g2'</span>])`},
+{t:"Method Chaining & pipe() — Production Pipelines",d:"Clean functional ETL patterns",c:`<span class="cm"># Method chaining — the pandas way to write clean code</span>
+result = (
+    df
+    .query(<span class="str">"region == 'South' and status == 'active'"</span>)
+    .dropna(subset=[<span class="str">'sales'</span>, <span class="str">'customer_id'</span>])
+    .drop_duplicates(<span class="str">'order_id'</span>)
+    .assign(
+        order_date = <span class="kw">lambda</span> x: pd.to_datetime(x[<span class="str">'order_date'</span>]),
+        tax        = <span class="kw">lambda</span> x: x[<span class="str">'sales'</span>] * <span class="num">0.18</span>,
+        net        = <span class="kw">lambda</span> x: x[<span class="str">'sales'</span>] - x[<span class="str">'tax'</span>],
+        month      = <span class="kw">lambda</span> x: x[<span class="str">'order_date'</span>].dt.to_period(<span class="str">'M'</span>)
+    )
+    .groupby([<span class="str">'month'</span>, <span class="str">'product'</span>])
+    .agg(total_net=(<span class="str">'net'</span>,<span class="str">'sum'</span>), orders=(<span class="str">'order_id'</span>,<span class="str">'count'</span>))
+    .sort_values(<span class="str">'total_net'</span>, ascending=<span class="kw">False</span>)
+    .reset_index()
+)
+
+<span class="cm"># pipe() — inject custom functions into chain</span>
+<span class="kw">def</span> <span class="fn">add_audit</span>(df, source):
+    <span class="kw">return</span> df.assign(_source=source, _loaded_at=pd.Timestamp.now())
+
+<span class="kw">def</span> <span class="fn">drop_sparse_cols</span>(df, threshold=<span class="num">0.8</span>):
+    min_non_null = int(len(df) * threshold)
+    <span class="kw">return</span> df.dropna(axis=<span class="num">1</span>, thresh=min_non_null)
+
+result = (df
+    .pipe(drop_sparse_cols, threshold=<span class="num">0.7</span>)
+    .pipe(add_audit, source=<span class="str">'orders_v3'</span>)
+)`},
+{t:"Full ETL Pipeline Pattern",d:"Production Data Engineering template",c:`<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> logging
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(<span class="str">'pipeline'</span>)
+
+<span class="kw">def</span> <span class="fn">extract</span>(path: str) -> pd.DataFrame:
+    df = pd.read_parquet(path)
+    log.info(<span class="str">f"Extracted {len(df):,} rows from {path}"</span>)
+    <span class="kw">return</span> df
+
+<span class="kw">def</span> <span class="fn">validate</span>(df: pd.DataFrame, required_cols: list) -> pd.DataFrame:
+    missing = [c <span class="kw">for</span> c <span class="kw">in</span> required_cols <span class="kw">if</span> c <span class="kw">not</span> <span class="kw">in</span> df.columns]
+    <span class="kw">if</span> missing: <span class="kw">raise</span> ValueError(<span class="str">f"Missing columns: {missing}"</span>)
+    <span class="kw">return</span> df
+
+<span class="kw">def</span> <span class="fn">clean</span>(df: pd.DataFrame) -> pd.DataFrame:
+    <span class="kw">return</span> (df
+        .rename(columns=str.lower)
+        .dropna(subset=[<span class="str">'order_id'</span>])
+        .drop_duplicates(<span class="str">'order_id'</span>)
+        .assign(
+            order_date = <span class="kw">lambda</span> x: pd.to_datetime(x[<span class="str">'order_date'</span>], errors=<span class="str">'coerce'</span>),
+            amount     = <span class="kw">lambda</span> x: pd.to_numeric(x[<span class="str">'amount'</span>], errors=<span class="str">'coerce'</span>),
+            status     = <span class="kw">lambda</span> x: x[<span class="str">'status'</span>].str.lower().str.strip()
+        )
+        .dropna(subset=[<span class="str">'order_date'</span>, <span class="str">'amount'</span>])
+    )
+
+<span class="kw">def</span> <span class="fn">enrich</span>(df: pd.DataFrame, products: pd.DataFrame) -> pd.DataFrame:
+    <span class="kw">return</span> df.merge(products[[<span class="str">'product_id'</span>,<span class="str">'category'</span>,<span class="str">'cost'</span>]], on=<span class="str">'product_id'</span>, how=<span class="str">'left'</span>)
+
+<span class="kw">def</span> <span class="fn">aggregate</span>(df: pd.DataFrame) -> pd.DataFrame:
+    <span class="kw">return</span> (df
+        .assign(month=<span class="kw">lambda</span> x: x[<span class="str">'order_date'</span>].dt.to_period(<span class="str">'M'</span>))
+        .groupby([<span class="str">'month'</span>, <span class="str">'region'</span>, <span class="str">'category'</span>])
+        .agg(revenue=(<span class="str">'amount'</span>,<span class="str">'sum'</span>), orders=(<span class="str">'order_id'</span>,<span class="str">'count'</span>), aov=(<span class="str">'amount'</span>,<span class="str">'mean'</span>))
+        .reset_index()
+    )
+
+<span class="kw">def</span> <span class="fn">load</span>(df: pd.DataFrame, dest: str) -> <span class="kw">None</span>:
+    Path(dest).parent.mkdir(parents=<span class="kw">True</span>, exist_ok=<span class="kw">True</span>)
+    df.to_parquet(dest, index=<span class="kw">False</span>, compression=<span class="str">'snappy'</span>)
+    log.info(<span class="str">f"Loaded {len(df):,} rows → {dest}"</span>)
+
+<span class="cm"># Run the pipeline</span>
+orders   = extract(<span class="str">"raw/orders.parquet"</span>)
+products = pd.read_csv(<span class="str">"dim/products.csv"</span>)
+(orders
+    .pipe(validate, required_cols=[<span class="str">'order_id'</span>,<span class="str">'order_date'</span>,<span class="str">'amount'</span>])
+    .pipe(clean)
+    .pipe(enrich, products)
+    .pipe(aggregate)
+    .pipe(load, <span class="str">"mart/order_metrics.parquet"</span>)
+)`}
+]},
+
+// ─────────────────────────── VISUALIZATION ───────────────────────────
+{id:"viz_basics",icon:"📈",title:"Data Visualization — Matplotlib & Seaborn",
+ level:"beginner",tags:["viz","da"],cat:"Visualization",
+ desc:"From quick plots to publication-quality charts. Matplotlib gives control, Seaborn gives beauty. Know both.",
+ cards:[
+{t:"Matplotlib — Essential Charts",d:"Core plotting library — full control",c:`<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> matplotlib.ticker <span class="kw">as</span> mticker
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Basic plot setup</span>
+fig, ax = plt.subplots(figsize=(<span class="num">10</span>, <span class="num">6</span>))
+
+<span class="cm"># Line chart</span>
+ax.plot(x, y, color=<span class="str">'#2563eb'</span>, linewidth=<span class="num">2</span>, label=<span class="str">'Sales'</span>, marker=<span class="str">'o'</span>)
+
+<span class="cm"># Bar chart</span>
+ax.bar(categories, values, color=<span class="str">'steelblue'</span>, alpha=<span class="num">0.8</span>, edgecolor=<span class="str">'white'</span>)
+
+<span class="cm"># Horizontal bar</span>
+ax.barh(categories, values, color=<span class="str">'steelblue'</span>)
+
+<span class="cm"># Scatter plot</span>
+ax.scatter(x, y, s=<span class="num">50</span>, c=colors, cmap=<span class="str">'viridis'</span>, alpha=<span class="num">0.7</span>)
+
+<span class="cm"># Histogram</span>
+ax.hist(data, bins=<span class="num">30</span>, color=<span class="str">'steelblue'</span>, edgecolor=<span class="str">'white'</span>, density=<span class="kw">True</span>)
+
+<span class="cm"># Box plot</span>
+ax.boxplot([data1, data2], labels=[<span class="str">'A'</span>,<span class="str">'B'</span>], patch_artist=<span class="kw">True</span>)
+
+<span class="cm"># Fill between</span>
+ax.fill_between(x, y1, y2, alpha=<span class="num">0.3</span>, color=<span class="str">'blue'</span>)
+
+<span class="cm"># Styling</span>
+ax.set_title(<span class="str">'Revenue by Month'</span>, fontsize=<span class="num">14</span>, fontweight=<span class="str">'bold'</span>, pad=<span class="num">15</span>)
+ax.set_xlabel(<span class="str">'Month'</span>, fontsize=<span class="num">12</span>)
+ax.set_ylabel(<span class="str">'Revenue ($)'</span>, fontsize=<span class="num">12</span>)
+ax.legend(frameon=<span class="kw">False</span>)
+ax.grid(axis=<span class="str">'y'</span>, alpha=<span class="num">0.3</span>, linestyle=<span class="str">'--'</span>)
+ax.spines[<span class="str">'top'</span>].set_visible(<span class="kw">False</span>)
+ax.spines[<span class="str">'right'</span>].set_visible(<span class="kw">False</span>)
+ax.yaxis.set_major_formatter(mticker.FuncFormatter(<span class="kw">lambda</span> x,_: f<span class="str">'\${x:,.0f}'</span>))
+ax.tick_params(axis=<span class="str">'x'</span>, rotation=<span class="num">45</span>)
+
+plt.tight_layout()
+plt.savefig(<span class="str">'chart.png'</span>, dpi=<span class="num">150</span>, bbox_inches=<span class="str">'tight'</span>)
+plt.show()`},
+{t:"Seaborn — Statistical Visualization",d:"Beautiful statistical charts in 2 lines",c:`<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># Set theme</span>
+sns.set_theme(style=<span class="str">'whitegrid'</span>, palette=<span class="str">'husl'</span>, font_scale=<span class="num">1.1</span>)
+<span class="cm"># Styles: whitegrid, darkgrid, white, dark, ticks</span>
+
+<span class="cm"># Distribution plots</span>
+sns.histplot(df[<span class="str">'salary'</span>], bins=<span class="num">30</span>, kde=<span class="kw">True</span>)                    <span class="cm"># histogram + KDE</span>
+sns.kdeplot(df[<span class="str">'salary'</span>], fill=<span class="kw">True</span>)                              <span class="cm"># density curve</span>
+sns.boxplot(x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, data=df, hue=<span class="str">'city'</span>)           <span class="cm"># box by group</span>
+sns.violinplot(x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, data=df, inner=<span class="str">'box'</span>)       <span class="cm"># violin plot</span>
+sns.stripplot(x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, data=df, jitter=<span class="kw">True</span>)        <span class="cm"># jitter plot</span>
+sns.ecdfplot(df[<span class="str">'salary'</span>])                                         <span class="cm"># empirical CDF</span>
+
+<span class="cm"># Categorical plots</span>
+sns.barplot(x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, data=df, estimator=<span class="str">'mean'</span>, errorbar=(<span class="str">'ci'</span>,<span class="num">95</span>))
+sns.countplot(x=<span class="str">'dept'</span>, data=df, order=df[<span class="str">'dept'</span>].value_counts().index)
+sns.pointplot(x=<span class="str">'month'</span>, y=<span class="str">'sales'</span>, data=df, hue=<span class="str">'region'</span>)
+
+<span class="cm"># Relational plots</span>
+sns.scatterplot(x=<span class="str">'age'</span>, y=<span class="str">'salary'</span>, hue=<span class="str">'dept'</span>, size=<span class="str">'bonus'</span>, data=df)
+sns.lineplot(x=<span class="str">'date'</span>, y=<span class="str">'sales'</span>, hue=<span class="str">'region'</span>, data=df)
+sns.regplot(x=<span class="str">'age'</span>, y=<span class="str">'salary'</span>, data=df, scatter_kws={<span class="str">'alpha'</span>:<span class="num">0.5</span>})
+
+<span class="cm"># Heatmap (correlation matrix)</span>
+corr = df.select_dtypes(<span class="str">'number'</span>).corr()
+sns.heatmap(corr, annot=<span class="kw">True</span>, fmt=<span class="str">'.2f'</span>, cmap=<span class="str">'coolwarm'</span>, center=<span class="num">0</span>,
+            vmin=-<span class="num">1</span>, vmax=<span class="num">1</span>, square=<span class="kw">True</span>, linewidths=<span class="num">0.5</span>)
+
+<span class="cm"># Pairplot (all combinations)</span>
+sns.pairplot(df, hue=<span class="str">'dept'</span>, diag_kind=<span class="str">'kde'</span>, plot_kws={<span class="str">'alpha'</span>:<span class="num">0.5</span>})`},
+{t:"Advanced Visualization — Subplots & FacetGrid",d:"Multi-panel and faceted charts",c:`<span class="cm"># Multiple subplots</span>
+fig, axes = plt.subplots(<span class="num">2</span>, <span class="num">3</span>, figsize=(<span class="num">15</span>, <span class="num">8</span>))
+fig.suptitle(<span class="str">'Regional Performance Dashboard'</span>, fontsize=<span class="num">16</span>, fontweight=<span class="str">'bold'</span>)
+
+<span class="kw">for</span> ax, (region, data) <span class="kw">in</span> zip(axes.flatten(), df.groupby(<span class="str">'region'</span>)):
+    ax.plot(data[<span class="str">'date'</span>], data[<span class="str">'sales'</span>], linewidth=<span class="num">2</span>)
+    ax.set_title(region, fontweight=<span class="str">'bold'</span>)
+    ax.grid(alpha=<span class="num">0.3</span>)
+
+plt.tight_layout()
+
+<span class="cm"># FacetGrid — seaborn multi-panel</span>
+g = sns.FacetGrid(df, col=<span class="str">'region'</span>, row=<span class="str">'year'</span>, height=<span class="num">4</span>, aspect=<span class="num">1.5</span>)
+g.map_dataframe(sns.lineplot, x=<span class="str">'month'</span>, y=<span class="str">'sales'</span>)
+g.add_legend()
+g.set_axis_labels(<span class="str">'Month'</span>, <span class="str">'Sales'</span>)
+g.set_titles(<span class="str">'{row_name} | {col_name}'</span>)
+
+<span class="cm"># Annotate specific points</span>
+fig, ax = plt.subplots(figsize=(<span class="num">10</span>, <span class="num">6</span>))
+ax.plot(df[<span class="str">'date'</span>], df[<span class="str">'sales'</span>])
+max_idx = df[<span class="str">'sales'</span>].idxmax()
+ax.annotate(
+    f<span class="str">"Peak: {df.loc[max_idx,'sales']:,.0f}"</span>,
+    xy=(df.loc[max_idx,<span class="str">'date'</span>], df.loc[max_idx,<span class="str">'sales'</span>]),
+    xytext=(<span class="num">30</span>, -<span class="num">30</span>), textcoords=<span class="str">'offset points'</span>,
+    arrowprops=dict(arrowstyle=<span class="str">'->'</span>, color=<span class="str">'red'</span>),
+    fontsize=<span class="num">10</span>, color=<span class="str">'red'</span>
+)`}
+]},
+
+{id:"viz_advanced",icon:"🎨",title:"Advanced Visualization — Plotly & Dashboards",
+ level:"advanced",tags:["viz","da","advanced"],cat:"Visualization",
+ desc:"Interactive charts with Plotly, business dashboards, and chart selection guidelines.",
+ cards:[
+{t:"Plotly — Interactive Charts",d:"Web-ready interactive visualizations",c:`pip install plotly
+
+<span class="kw">import</span> plotly.express <span class="kw">as</span> px
+<span class="kw">import</span> plotly.graph_objects <span class="kw">as</span> go
+<span class="kw">from</span> plotly.subplots <span class="kw">import</span> make_subplots
+
+<span class="cm"># Line chart</span>
+fig = px.line(df, x=<span class="str">'date'</span>, y=<span class="str">'sales'</span>, color=<span class="str">'region'</span>,
+              title=<span class="str">'Sales Over Time by Region'</span>)
+fig.show()
+
+<span class="cm"># Bar chart</span>
+fig = px.bar(df, x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, color=<span class="str">'city'</span>, barmode=<span class="str">'group'</span>)
+
+<span class="cm"># Scatter with size + color</span>
+fig = px.scatter(df, x=<span class="str">'age'</span>, y=<span class="str">'salary'</span>, size=<span class="str">'bonus'</span>,
+                 color=<span class="str">'dept'</span>, hover_data=[<span class="str">'name'</span>],
+                 title=<span class="str">'Salary vs Age'</span>)
+
+<span class="cm"># Heatmap</span>
+pivot = df.pivot_table(values=<span class="str">'sales'</span>, index=<span class="str">'month'</span>, columns=<span class="str">'region'</span>)
+fig = px.imshow(pivot, color_continuous_scale=<span class="str">'RdBu_r'</span>, aspect=<span class="str">'auto'</span>)
+
+<span class="cm"># Treemap</span>
+fig = px.treemap(df, path=[<span class="str">'region'</span>,<span class="str">'dept'</span>], values=<span class="str">'revenue'</span>,
+                 color=<span class="str">'growth_pct'</span>, color_continuous_scale=<span class="str">'RdYlGn'</span>)
+
+<span class="cm"># Box + violin</span>
+fig = px.box(df, x=<span class="str">'dept'</span>, y=<span class="str">'salary'</span>, points=<span class="str">'all'</span>, notched=<span class="kw">True</span>)
+
+<span class="cm"># Funnel chart</span>
+fig = px.funnel(df, x=<span class="str">'value'</span>, y=<span class="str">'stage'</span>, title=<span class="str">'Sales Funnel'</span>)
+
+<span class="cm"># Save</span>
+fig.write_html(<span class="str">'chart.html'</span>)
+fig.write_image(<span class="str">'chart.png'</span>, scale=<span class="num">2</span>)`},
+{t:"Chart Selection Guide & Color Theory",d:"When to use which chart type",c:`<span class="cm">"""
+CHART SELECTION GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COMPARISON:
+  Bar chart       → compare categories (≤10 items)
+  Horizontal bar  → long category names, many items
+  Grouped bar     → compare across 2 categories
+  Dot/lollipop    → similar to bar, less ink
+
+DISTRIBUTION:
+  Histogram       → show frequency distribution
+  KDE/density     → smooth distribution curve
+  Box plot        → show quartiles + outliers
+  Violin plot     → distribution shape + stats
+  ECDF            → cumulative distribution
+
+RELATIONSHIP:
+  Scatter plot    → correlation between 2 variables
+  Bubble chart    → 3 variables at once
+  Heatmap         → correlation matrix
+  Pair plot       → all variable combinations
+
+COMPOSITION:
+  Stacked bar     → part-to-whole over categories
+  100% bar        → proportions across categories
+  Pie/donut       → AVOID (use bar instead)
+  Treemap         → hierarchical proportions
+
+TREND/TIME:
+  Line chart      → continuous time series
+  Area chart      → accumulated values over time
+  Candlestick     → OHLC financial data
+
+GEOSPATIAL:
+  Choropleth      → values by region/country
+  Bubble map      → values at locations
+
+GOOD COLORS:
+  Categorical: ['#2563eb','#16a34a','#dc2626','#d97706','#7c3aed']
+  Sequential:  'Blues', 'YlOrRd', 'viridis', 'plasma'
+  Diverging:   'RdBu_r', 'coolwarm', 'PiYG'
+  Colorblind-safe: 'tab10', 'Set2'
+"""
+
+<span class="cm"># Apply a clean style to all your plots</span>
+plt.rcParams.update({
+    <span class="str">'figure.facecolor'</span>: <span class="str">'white'</span>,
+    <span class="str">'axes.facecolor'</span>: <span class="str">'white'</span>,
+    <span class="str">'font.family'</span>: <span class="str">'DejaVu Sans'</span>,
+    <span class="str">'axes.grid'</span>: <span class="kw">True</span>,
+    <span class="str">'grid.alpha'</span>: <span class="num">0.3</span>,
+    <span class="str">'axes.spines.top'</span>: <span class="kw">False</span>,
+    <span class="str">'axes.spines.right'</span>: <span class="kw">False</span>,
+    <span class="str">'figure.dpi'</span>: <span class="num">100</span>,
+})`}
+]},
+
+// ─────────────────────────── EDA ───────────────────────────
+{id:"pd_eda",icon:"🔍",title:"Exploratory Data Analysis (EDA)",
+ level:"intermediate",tags:["intermediate","da"],cat:"Analysis",
+ desc:"A systematic EDA workflow: profiling, distributions, correlations, outliers, and business-ready insights.",
+ cards:[
+{t:"EDA Workflow — Systematic Approach",d:"Complete EDA pattern from scratch",c:`<span class="cm"># STEP 1: Basic overview</span>
+<span class="kw">def</span> <span class="fn">quick_eda</span>(df):
+    <span class="fn">print</span>(<span class="str">f"Shape: {df.shape[0]:,} rows × {df.shape[1]} cols"</span>)
+    <span class="fn">print</span>(<span class="str">f"Memory: {df.memory_usage(deep=True).sum()/1e6:.1f} MB"</span>)
+    <span class="fn">print</span>(<span class="str">f"Duplicates: {df.duplicated().sum():,}"</span>)
+    null_df = df.isna().sum()
+    null_df = null_df[null_df > <span class="num">0</span>].sort_values(ascending=<span class="kw">False</span>)
+    <span class="kw">if</span> len(null_df): <span class="fn">print</span>(<span class="str">f"\nMissing values:\n{null_df}"</span>)
+    <span class="fn">print</span>(<span class="str">f"\nDtypes:\n{df.dtypes.value_counts()}"</span>)
+    <span class="kw">return</span> df.describe(include=<span class="str">'all'</span>).T.round(<span class="num">2</span>)
+
+<span class="cm"># STEP 2: Numeric distributions</span>
+num_cols = df.select_dtypes(<span class="str">'number'</span>).columns
+df[num_cols].hist(bins=<span class="num">30</span>, figsize=(<span class="num">16</span>,<span class="num">12</span>), layout=(<span class="num">3</span>,<span class="num">4</span>))
+plt.tight_layout()
+
+<span class="cm"># STEP 3: Correlation matrix</span>
+corr = df[num_cols].corr()
+strong = corr[(corr.abs() > <span class="num">0.6</span>) & (corr < <span class="num">1</span>)].stack().reset_index()
+strong.columns = [<span class="str">'feat1'</span>, <span class="str">'feat2'</span>, <span class="str">'corr'</span>]
+
+<span class="cm"># STEP 4: Outliers per numeric column</span>
+<span class="kw">def</span> <span class="fn">get_outliers</span>(series):
+    Q1, Q3 = series.quantile([<span class="num">0.25</span>, <span class="num">0.75</span>])
+    IQR = Q3 - Q1
+    <span class="kw">return</span> series[(series < Q1 - <span class="num">1.5</span>*IQR) | (series > Q3 + <span class="num">1.5</span>*IQR)]
+
+<span class="kw">for</span> col <span class="kw">in</span> num_cols:
+    out = get_outliers(df[col])
+    <span class="kw">if</span> len(out): <span class="fn">print</span>(<span class="str">f"{col}: {len(out)} outliers ({len(out)/len(df)*100:.1f}%)"</span>)
+
+<span class="cm"># STEP 5: Categorical frequencies</span>
+cat_cols = df.select_dtypes(<span class="str">'object'</span>).columns
+<span class="kw">for</span> col <span class="kw">in</span> cat_cols:
+    <span class="fn">print</span>(<span class="str">f"\n{col} (top 10):\n{df[col].value_counts().head(10)}"</span>)`}
+]},
+
+// ─────────────────────────── INTERVIEW ───────────────────────────
+{id:"interview_core",icon:"🎯",title:"Interview Questions — Core Concepts",
+ level:"beginner",tags:["interview"],cat:"Interview Prep",
+ desc:"The most-asked fundamental questions you'll face in any data role interview.",
+ isInterview:true,
+ qs:[
+{q:"What is pandas and what are its key advantages?",lvl:"beginner",a:`Pandas is an open-source Python library built on top of NumPy, designed for data manipulation and analysis. It provides two key data structures: **Series** (1D) and **DataFrame** (2D).
+
+Key advantages:
+- Handles heterogeneous data (multiple dtypes in one table)
+- Powerful I/O tools (CSV, Excel, SQL, Parquet, JSON)
+- Intuitive data alignment and missing value handling
+- High-performance groupby, merge, and time series operations
+- Integrates seamlessly with NumPy, Matplotlib, Scikit-learn
+- Method chaining enables clean, readable data pipelines
+
+Unlike Excel, pandas handles millions of rows, is fully scriptable, and supports reproducible workflows.`},
+{q:"What is the difference between Series and DataFrame?",lvl:"beginner",a:`**Series** is a 1-dimensional labeled array that can hold any data type (int, float, string, Python objects). It has an index and a name attribute.
+
+**DataFrame** is a 2-dimensional labeled data structure like a spreadsheet or SQL table — a collection of Series sharing the same index. Each column is a Series.
+
+Key points for interviews:
+- A DataFrame is essentially a dict of Series with a shared index
+- Operations on DataFrames are often column-wise (axis=0) or row-wise (axis=1)
+- A single column of a DataFrame is a Series: df['col'] → Series
+
+Both are built on top of NumPy arrays, which is why they're fast.`,code:`s = pd.Series([10, 20, 30], index=['a','b','c'], name='values')
+df = pd.DataFrame({'A': [1,2,3], 'B': [4,5,6]})`},
+{q:"What is the difference between loc and iloc?",lvl:"beginner",a:`**loc** is LABEL-based: you use the actual index labels/column names.
+**iloc** is POSITION-based: you use integer positions (0, 1, 2...).
+
+Critical difference with slicing:
+- loc[0:5] → includes row 5 (inclusive end)
+- iloc[0:5] → excludes row 5 (exclusive end, like Python lists)
+
+Use loc when: you want to filter by label, work with string index, or read comprehensibly.
+Use iloc when: you need positional access, last N rows, or every Nth row.`,code:`df.loc[0, 'name']      # label-based: row label 0, column 'name'
+df.iloc[0, 1]          # position-based: 1st row, 2nd column
+df.loc[df['age']>25]   # boolean with loc (recommended)
+df.iloc[-5:]           # last 5 rows (position-based)`},
+{q:"How do you handle missing values in pandas?",lvl:"beginner",a:`There are three approaches depending on the situation:
+
+1. **Drop**: Use dropna() when missing data is rare and rows/cols can be sacrificed without biasing results.
+2. **Fill**: Use fillna() with a static value, mean/median/mode, or forward/backward fill. The right choice depends on data type and business logic — median for skewed distributions, forward fill for time series.
+3. **Interpolate**: Use interpolate() for smooth imputation in time series.
+
+Key patterns to know:
+- Always check % missing first: df.isna().sum()/len(df)*100
+- Use dropna(subset=['critical_col']) to only drop when key columns are null
+- Never blindly fill all with 0 — zero means something in most domains!`,code:`# Check
+df.isna().sum() / len(df) * 100  # % missing per column
+
+# Drop
+df.dropna(subset=['order_id', 'customer_id'])
+
+# Fill smartly
+df['price'].fillna(df['price'].median())   # median for skewed
+df['status'].fillna('Unknown')             # default category
+df['sensor'].ffill()                       # time series forward fill`},
+{q:"What is the difference between merge and concat?",lvl:"intermediate",a:`**merge** is a SQL-style JOIN operation — combines columns from two DataFrames based on matching key values. It's used when you have a relational structure.
+
+**concat** simply stacks DataFrames either vertically (more rows) or horizontally (more columns) by aligning on the index. No matching on key values.
+
+When to use each:
+- merge: "Join orders with customers on customer_id" (relational)
+- concat: "Combine January, February, March sales data" (stacking)
+
+Common mistake: using concat with axis=1 when merge is needed — this aligns on index which may not be the join key.`,code:`# merge — relational join
+pd.merge(orders, customers, on='customer_id', how='left')
+
+# concat — simple stacking
+pd.concat([jan, feb, mar], ignore_index=True)  # vertical
+pd.concat([df1, df2], axis=1)                  # horizontal`},
+{q:"What is groupby and how does transform differ from agg?",lvl:"intermediate",a:`**groupby** splits the DataFrame into groups, applies an aggregation/transformation, and combines results.
+
+**agg** (aggregate) collapses each group into a single value per group — the result has fewer rows than the original.
+
+**transform** applies a function to each group but returns a result with the SAME shape as the original DataFrame. This is perfect for adding group statistics back to the original data without losing rows.
+
+Real-world example: You want to see each employee's salary relative to their department average. agg would give you one avg per dept. transform broadcasts that avg back to every employee row.`,code:`# agg — one row per group
+df.groupby('dept')['salary'].mean()  # returns Series with one row per dept
+
+# transform — same shape as original
+df['dept_avg'] = df.groupby('dept')['salary'].transform('mean')
+# Now df has a new column with each employee's dept average
+df['relative_sal'] = df['salary'] / df['dept_avg']`}
+]},
+
+{id:"interview_intermediate",icon:"💡",title:"Interview Questions — Intermediate Level",
+ level:"intermediate",tags:["interview"],cat:"Interview Prep",
+ desc:"Questions for 2-4 years experience roles. Expect these in data engineer and senior analyst interviews.",
+ isInterview:true,
+ qs:[
+{q:"How would you optimize a pandas pipeline processing 10 million rows?",lvl:"intermediate",a:`Multi-pronged approach for large data performance:
+
+**1. Optimize dtypes first** (biggest single impact)
+- Use int32 instead of int64, float32 instead of float64
+- Convert low-cardinality strings to category dtype (10x memory reduction)
+- Use PyArrow backend (Pandas 2.0+): dtype_backend='pyarrow'
+
+**2. Use vectorized operations** — never loops:
+- Replace apply(lambda) with np.where, np.select, or arithmetic
+- Use eval() for complex expressions on large DataFrames
+- String ops: always use .str accessor, never loop
+
+**3. Load only what you need**:
+- usecols parameter to load specific columns
+- nrows/chunksize for partial loads
+- Parquet with column pruning
+
+**4. Choose the right format**:
+- Parquet instead of CSV: 5-10x smaller, much faster I/O, supports column pruning
+
+**5. If still slow**: consider Dask (parallel pandas) or Polars (Rust-based, 10x faster)`,code:`# Before: 4 GB, slow
+df = pd.read_csv('huge.csv')
+df['result'] = df.apply(lambda r: r['a'] * r['b'], axis=1)
+
+# After: 400 MB, fast
+df = pd.read_parquet('huge.parquet', columns=['a','b','c'], engine='pyarrow')
+df = df.astype({'a':'float32','b':'float32','c':'category'})
+df['result'] = df['a'] * df['b']  # vectorized`},
+{q:"Explain the difference between pivot and pivot_table?",lvl:"intermediate",a:`**pivot** is simple reshaping — no aggregation. It transforms long format to wide format by using one column as the new column names and another as values. It raises an error if there are duplicate index/column combinations.
+
+**pivot_table** is like pivot + groupby. It handles duplicates by applying an aggregation function (default: mean). It also supports:
+- Multiple value columns
+- Multiple aggfuncs
+- Fill_value for missing combinations
+- Margins for row/column totals
+
+Rule of thumb: use pivot when data is already deduplicated; use pivot_table when you need aggregation.`,code:`# pivot — requires unique combinations
+df.pivot(index='date', columns='product', values='sales')
+# Raises ValueError if date+product is not unique
+
+# pivot_table — handles duplicates with aggregation
+pd.pivot_table(df, values='sales', index='date', 
+               columns='product', aggfunc='sum', fill_value=0, margins=True)`},
+{q:"What is method chaining and why is it preferred?",lvl:"intermediate",a:`Method chaining applies multiple operations sequentially in a single expression by calling methods on the result of the previous method, wrapped in parentheses.
+
+**Why it's preferred:**
+- Readable top-to-bottom flow (like SQL)
+- No intermediate variables cluttering namespace
+- Easy to add/remove steps
+- Can use pipe() to inject custom functions
+- Avoids SettingWithCopyWarning issues
+
+**Anti-patterns to avoid:**
+- Storing intermediate DataFrames unless needed for debugging
+- Using inplace=True inside a chain (breaks the chain)
+- Mixing chaining with direct assignment`,code:`# Clean method chain
+result = (
+    df
+    .query("status == 'active'")
+    .dropna(subset=['email', 'purchase_date'])
+    .assign(
+        purchase_date=lambda x: pd.to_datetime(x['purchase_date']),
+        ltv=lambda x: x['revenue'] * x['avg_order_freq']
+    )
+    .groupby('cohort_month')
+    .agg(users=('user_id','nunique'), total_ltv=('ltv','sum'))
+    .reset_index()
+)`},
+{q:"How do you detect and handle data quality issues in a pipeline?",lvl:"intermediate",a:`A systematic data quality framework has 5 pillars:
+
+**1. Completeness**: Missing values → df.isna().sum()/len(df)
+**2. Uniqueness**: Duplicates → df.duplicated(subset='key').sum()
+**3. Validity**: Format checks → regex, pd.to_datetime(errors='coerce')
+**4. Consistency**: Cross-field rules → (df['end'] > df['start']).all()
+**5. Accuracy**: Range checks → df['age'].between(0, 120).all()
+
+In production pipelines, always:
+- Validate before transformation, not after
+- Log row counts at each stage
+- Use assert statements for critical invariants
+- Track schema drift (dtypes, column count changes)
+- Set up alerting when null % exceeds threshold`,code:`def validate_dataframe(df, config):
+    errors = []
+    # Nulls
+    for col in config.get('required', []):
+        null_pct = df[col].isna().mean() * 100
+        if null_pct > config.get('max_null_pct', 5):
+            errors.append(f"{col}: {null_pct:.1f}% nulls (threshold: 5%)")
+    # Duplicates
+    key = config.get('primary_key')
+    if key and df.duplicated(subset=key).sum() > 0:
+        errors.append(f"Duplicate {key} values detected")
+    # Ranges
+    for col, (lo, hi) in config.get('ranges', {}).items():
+        bad = (~df[col].between(lo, hi)).sum()
+        if bad: errors.append(f"{col}: {bad} values outside [{lo}, {hi}]")
+    if errors:
+        raise ValueError("Data quality failures:\n" + "\n".join(errors))
+    return df`},
+{q:"What is a MultiIndex and when would you use it?",lvl:"intermediate",a:`A MultiIndex (hierarchical index) uses multiple levels of indexing on rows or columns. It's created naturally by groupby with multiple keys or can be created explicitly.
+
+**When to use:**
+- Cross-sectional/panel data (time × entity)
+- Nested group aggregations
+- Financial data (stock × date)
+- Survey data (respondent × question)
+
+**When NOT to use:**
+- It's often cleaner to reset_index() and work with regular columns
+- MultiIndex can be confusing for colleagues — prefer it only when the hierarchy is genuinely meaningful
+
+Most production code resets the index to flat columns for readability and compatibility with databases.`,code:`# Created by groupby
+multi = df.groupby(['dept', 'city'])['salary'].mean()
+
+# Access patterns
+multi['IT']                      # all cities for IT
+multi[('IT', 'Mumbai')]          # specific combination
+multi.xs('Mumbai', level='city') # cross-section: all depts in Mumbai
+
+# Usually better to flatten immediately
+df_flat = multi.reset_index()    # dept, city, salary columns`}
+]},
+
+{id:"interview_advanced",icon:"🔥",title:"Interview Questions — Advanced / Senior Level",
+ level:"advanced",tags:["interview"],cat:"Interview Prep",
+ desc:"Senior DE/DA interview questions: performance, architecture, production patterns, and trade-offs.",
+ isInterview:true,
+ qs:[
+{q:"Explain how pandas 2.0 changed the internals and why PyArrow matters",lvl:"advanced",a:`**Pandas 2.0 (2023)** introduced a new Copy-on-Write (CoW) semantic and the PyArrow backend.
+
+**Copy-on-Write (CoW)**: Previously, views and copies were ambiguous, causing SettingWithCopyWarning. With CoW, any modification triggers a copy — eliminating the warning and making behavior predictable. In Pandas 3.0, CoW becomes the default.
+
+**PyArrow backend**: Instead of NumPy arrays as the underlying storage, pandas can now use Apache Arrow memory format.
+
+Benefits of PyArrow backend:
+- Native nullable integer types (pd.NA instead of float NaN for missing ints)
+- True string dtype (not stored as Python objects)
+- Faster I/O for Parquet (same format used by Spark, DuckDB)
+- Lower memory usage
+- Can share memory with Spark, DuckDB, Polars zero-copy
+
+For DE pipelines processing terabytes, PyArrow backend can be 2-5x faster and use 50% less memory.`,code:`# Enable PyArrow backend
+df = pd.read_parquet('data.parquet', dtype_backend='pyarrow')
+df = pd.read_csv('data.csv', dtype_backend='pyarrow', engine='pyarrow')
+
+# Check: PyArrow dtypes look like:
+# string[pyarrow], int64[pyarrow], double[pyarrow]
+print(df.dtypes)
+
+# Convert existing DataFrame
+df = df.convert_dtypes(dtype_backend='pyarrow')`},
+{q:"How would you design a scalable data pipeline using pandas? When would you migrate to Spark or Polars?",lvl:"advanced",a:`**Pandas is appropriate when:**
+- Data fits in RAM (up to ~5GB comfortably, up to ~20GB with optimizations)
+- Team knows Python/pandas well
+- Processing is batch, not streaming
+- Single-machine workloads
+
+**Migrate to Polars when:**
+- Data is 1-50GB but fits on one machine
+- Need 5-20x speed improvement over pandas
+- Polars is Rust-based, lazy evaluation, parallel by default
+
+**Migrate to Spark/Dask when:**
+- Data exceeds single machine RAM
+- Need distributed computing across cluster
+- Processing petabyte-scale data warehouses
+
+**Migration decision framework:**
+1. First: optimize pandas (dtypes, vectorization, Parquet, PyArrow) → often enough
+2. If single machine: try Polars (API very similar to pandas)
+3. If multi-machine: Spark (Databricks/EMR) or Dask (pandas-compatible API)
+
+In practice: most companies' "big data" problems are solved by better pandas code, not Spark.`,code:`# Polars migration — very similar API
+import polars as pl
+
+# Polars: lazy evaluation (builds query plan, executes optimally)
+result = (
+    pl.scan_parquet('huge_data/*.parquet')  # lazy scan
+    .filter(pl.col('status') == 'active')
+    .groupby('region')
+    .agg(pl.col('revenue').sum(), pl.col('order_id').count())
+    .collect()  # execute
+)`},
+{q:"Explain the GroupBy split-apply-combine paradigm and common performance pitfalls",lvl:"advanced",a:`GroupBy follows three steps:
+1. **Split**: Divide DataFrame into groups
+2. **Apply**: Run a function on each group
+3. **Combine**: Concatenate results
+
+**Performance pitfalls:**
+
+1. **apply() is slow** — it calls Python for each group, bypassing NumPy. Always prefer:
+   - Built-in aggregations (sum, mean, count) — C-optimized
+   - transform() with built-in functions
+   - Named agg() with built-in functions
+
+2. **apply with axis=1** inside groupby — doubly slow
+   Solution: pre-vectorize, then groupby
+
+3. **Using 'object' dtype columns as groupby keys** — slow
+   Solution: convert to 'category' dtype first
+
+4. **Not using observed=True with category keys** — generates empty groups
+   Solution: df.groupby('cat_col', observed=True)
+
+5. **Calling reset_index() in a loop** — accumulates copies
+   Solution: do it once at the end`,code:`# SLOW: Python-level apply
+df.groupby('dept').apply(lambda g: g['salary'].mean())
+
+# FAST: C-optimized built-in
+df.groupby('dept')['salary'].mean()
+
+# FAST: category key with observed=True
+df['dept'] = df['dept'].astype('category')
+df.groupby('dept', observed=True)['salary'].mean()
+
+# SLOW: apply returning DataFrame
+df.groupby('dept').apply(lambda g: g.nlargest(2, 'salary'))
+
+# FASTER: transform + boolean mask
+df[df.groupby('dept')['salary'].rank(method='dense', ascending=False) <= 2]`},
+{q:"How do you handle schema evolution in a pandas-based data pipeline?",lvl:"advanced",a:`Schema evolution means handling changes to the data structure over time — new columns, renamed columns, changed types, removed columns.
+
+**Strategies:**
+
+1. **Explicit schema validation** — catch problems at ingestion:
+   - Define expected schema (column names + dtypes)
+   - Assert presence of required columns
+   - Log schema changes as warnings, not errors (for optional cols)
+
+2. **Column selection by name, not position** — resilient to added/removed columns:
+   - Never use df.iloc[:, 3] for "the sales column"
+   - Use df[['col1','col2']] explicitly
+
+3. **Default values for new optional columns**:
+   - df.get('new_col', pd.Series(default_val, index=df.index))
+
+4. **Type coercion, not assumptions**:
+   - pd.to_numeric(df['price'], errors='coerce') always
+   - Never assume string will always be a number
+
+5. **Version your schemas** in code:
+   - REQUIRED_COLS = ['id', 'date', 'amount']
+   - OPTIONAL_COLS = {'channel': 'Unknown', 'source': None}`,code:`SCHEMA = {
+    'required': {'order_id': 'int64', 'amount': 'float64', 'date': 'datetime64'},
+    'optional': {'channel': ('object', 'Unknown'), 'discount': ('float64', 0.0)}
+}
+
+def apply_schema(df, schema):
+    # Check required
+    missing = set(schema['required']) - set(df.columns)
+    if missing: raise SchemaError(f"Missing required columns: {missing}")
+    
+    # Add optional with defaults
+    for col, (dtype, default) in schema['optional'].items():
+        if col not in df.columns:
+            df[col] = default
+    
+    # Cast types
+    for col, dtype in schema['required'].items():
+        df[col] = df[col].astype(dtype, errors='ignore')
+    return df`},
+{q:"Walk me through how you'd implement a cohort retention analysis in pandas",lvl:"advanced",a:`Cohort retention analysis tracks what % of users acquired in a given period (cohort) return in subsequent periods.
+
+**Steps:**
+1. Assign each user their acquisition cohort (first purchase month)
+2. For each event, calculate period index (how many months since cohort)
+3. Calculate cohort sizes (denominator for %)
+4. Build retention matrix: group by cohort × period_index, count unique users
+5. Divide by cohort size to get retention %
+
+Key pandas operations used:
+- groupby + transform('min') to get first purchase date per user
+- dt.to_period('M') for period alignment
+- pd.Period subtraction for period index
+- pivot/unstack for the matrix format
+- div(axis=0) for percentage calculation`,code:`from operator import attrgetter
+
+df['order_date'] = pd.to_datetime(df['order_date'])
+
+# Step 1: cohort = first purchase month per user
+df['cohort'] = (df.groupby('user_id')['order_date']
+                  .transform('min')
+                  .dt.to_period('M'))
+df['order_period'] = df['order_date'].dt.to_period('M')
+
+# Step 2: period index (months since cohort)
+df['period_idx'] = (df['order_period'] - df['cohort']).apply(attrgetter('n'))
+
+# Step 3: cohort sizes
+cohort_sizes = df.groupby('cohort')['user_id'].nunique()
+
+# Step 4 & 5: retention matrix
+retention = (
+    df.groupby(['cohort', 'period_idx'])['user_id']
+      .nunique()
+      .unstack('period_idx')
+      .div(cohort_sizes, axis=0)
+      .round(3) * 100
+)
+# retention[0] = 100% (same period), retention[1] = 1-month retention %`},
+{q:"What are the main differences between NumPy and Pandas? When do you use each?",lvl:"intermediate",a:`**NumPy is optimized for:**
+- Homogeneous numerical data (all same dtype)
+- Mathematical/scientific computing
+- Matrix operations, linear algebra
+- Performance-critical numerical loops
+- Multi-dimensional arrays (3D, 4D, etc.)
+
+**Pandas is built ON TOP of NumPy and is optimized for:**
+- Heterogeneous tabular data (mixed dtypes)
+- Labeled data (row index, column names)
+- Real-world messy data (missing values, mixed types)
+- Data I/O (CSV, SQL, Excel, Parquet)
+- GroupBy, merge, time series operations
+
+**Rule of thumb:**
+- Raw numerical computation → NumPy (faster, lower memory)
+- Tabular data with labels → Pandas
+- ML features after preprocessing → convert to NumPy array (.values or .to_numpy())
+- Most pandas operations internally use NumPy
+
+They're complementary: use pandas for data wrangling, then convert to NumPy arrays for ML model training.`,code:`# NumPy: pure numerical computation
+a = np.random.randn(1000000)
+z_scores = (a - a.mean()) / a.std()  # very fast
+
+# Pandas: labeled tabular data
+df = pd.DataFrame(data)
+result = df.groupby('dept')['salary'].mean()
+
+# Interop: pandas → numpy for ML
+X = df[['age','salary','tenure']].to_numpy()  # NumPy array for sklearn`},
+{q:"How does pandas handle memory for string columns and how can you reduce it?",lvl:"advanced",a:`By default, pandas stores string (object) columns as Python objects — each string is a Python string object with a pointer in a NumPy array. This is extremely memory-inefficient:
+- 100k strings "IT"/"HR"/"Finance" stores 100k full string objects
+- Each Python string object has ~50+ bytes overhead
+
+**Solutions (by impact):**
+
+1. **Category dtype** (best for low-cardinality strings):
+   - Stores unique values once + integer codes
+   - "IT" appearing 50,000 times → stored once + 50k int8 codes
+   - Memory reduction: 10-100x for low-cardinality columns
+   - Use when: nunique/len ratio < 0.5
+
+2. **PyArrow string type** (Pandas 2.0+):
+   - Apache Arrow stores strings in contiguous memory (not Python objects)
+   - 2-3x more memory efficient than object dtype
+   - Also faster for string operations
+
+3. **Keep only needed columns** (usecols in read_csv/read_parquet)
+
+4. **Interning** (for very short strings): manually intern using sys.intern()`,code:`# Before
+df['dept'] = df['dept'].astype('object')  # ~200 bytes/row
+df.memory_usage(deep=True)['dept']  # huge
+
+# After: category
+df['dept'] = df['dept'].astype('category')  # ~1-4 bytes/row!
+
+# Check if category is beneficial
+nunique = df['dept'].nunique()
+total   = len(df['dept'])
+if nunique / total < 0.5:
+    df['dept'] = df['dept'].astype('category')
+
+# After: PyArrow strings (Pandas 2.0+)
+df = df.astype({'dept': 'string[pyarrow]'})`}
+]},
+
+{id:"interview_numpy",icon:"⚡",title:"Interview Questions — NumPy Specific",
+ level:"intermediate",tags:["interview","numpy"],cat:"Interview Prep",
+ desc:"NumPy questions for data science, DE, and ML engineering interviews.",
+ isInterview:true,
+ qs:[
+{q:"What is broadcasting in NumPy and how does it work?",lvl:"intermediate",a:`Broadcasting allows NumPy to perform operations on arrays of different shapes without explicitly copying data. It follows these rules:
+
+**Rules:**
+1. If arrays have different numbers of dimensions, prepend 1s to the shape of the smaller array
+2. Arrays with size 1 in a dimension are stretched to match the other array
+3. If sizes don't match and neither is 1, an error is raised
+
+**Why it matters for DE/DS:**
+- Column normalization: subtract column means without a loop
+- Distance computations: no nested loops needed
+- Feature scaling: divide by std across thousands of rows instantly
+- It's fundamentally how vectorized operations get their speed
+
+Broadcasting is one of the most important concepts for writing performant NumPy/pandas code.`,code:`# Example 1: Add scalar to array
+a = np.array([[1,2,3],[4,5,6]])  # (2,3)
+a + 10  # 10 broadcasts to (2,3)
+
+# Example 2: Normalize columns (very common in ML)
+data = np.random.randn(1000, 5)  # 1000 samples, 5 features
+means = data.mean(axis=0)        # (5,) — one mean per feature
+stds  = data.std(axis=0)         # (5,)
+normalized = (data - means) / stds  # (1000,5) - (5,) → broadcasts!
+
+# Example 3: Outer product (no loops)
+prices = np.array([10, 20, 30]).reshape(-1, 1)  # (3,1)
+qty    = np.array([1, 2, 3, 4])                 # (4,)
+matrix = prices * qty  # (3,4) — broadcasting!`},
+{q:"What is the difference between np.copy() and view? Why does it matter?",lvl:"intermediate",a:`A **view** shares memory with the original array — modifications to the view modify the original. A **copy** is an independent array — modifications don't affect the original.
+
+**Why it matters:**
+- Silent bugs: you think you're working with a copy but you're modifying the original
+- Performance: views are fast (no memory allocation), copies are slower
+- Memory: views use no extra memory, copies double it
+
+**When slices create views:**
+- Regular slicing: a[2:6] → view
+- Single element: a[0] → scalar (not view)
+- Boolean indexing: a[a>5] → always a copy (numpy can't maintain contiguous view)
+- Fancy indexing: a[[1,3,5]] → always a copy
+
+Check with: np.shares_memory(a, b)`,code:`a = np.array([1, 2, 3, 4, 5])
+
+# View — shares memory!
+b = a[1:4]
+b[0] = 99   # modifies a[1] too!
+print(a)    # [1, 99, 3, 4, 5] ← original changed!
+
+# Copy — independent
+c = a[1:4].copy()
+c[0] = 0    # does NOT affect a
+
+# Check
+np.shares_memory(a, b)  # True
+np.shares_memory(a, c)  # False
+
+# In pandas — same concept!
+# df[['col1']] may be a view → use .copy() to be safe
+df2 = df[['col1', 'col2']].copy()`}
+]},
+
+{id:"interview_viz",icon:"📊",title:"Interview Questions — Visualization",
+ level:"intermediate",tags:["interview","viz"],cat:"Interview Prep",
+ desc:"Visualization Q&A for data analyst and BI roles.",
+ isInterview:true,
+ qs:[
+{q:"How do you choose the right chart type for different data?",lvl:"beginner",a:`The right chart depends on the **relationship** you want to show:
+
+**Comparison** (A vs B vs C):
+- Bar chart for categorical comparison (horizontal if many categories or long labels)
+- Grouped bar for comparing across two dimensions simultaneously
+
+**Distribution** (how is data spread?):
+- Histogram for continuous variable frequency
+- Box plot for quartiles, outliers — especially across groups
+- Violin plot = box plot + density (more info, less standard)
+- KDE for smooth distribution shape
+
+**Relationship/Correlation**:
+- Scatter plot for two continuous variables
+- Bubble chart if you need to encode a third variable (size)
+- Heatmap for correlation matrix
+
+**Time series/Trend**:
+- Line chart — always for continuous time
+
+**Part-to-whole**:
+- Stacked bar or 100% bar (avoid pie charts — harder to compare)
+- Treemap for hierarchical composition
+
+**Anti-patterns to avoid in interviews:**
+- 3D charts (distort perception)
+- Pie charts with >5 slices
+- Dual Y-axis (confusing to read)
+- Truncated Y-axis (misleads magnitude)`},
+{q:"What is the difference between Matplotlib and Seaborn?",lvl:"beginner",a:`**Matplotlib** is the foundational plotting library — highly flexible but verbose. You control every detail explicitly. It's object-oriented (Figure, Axes) and imperative.
+
+**Seaborn** is built on top of Matplotlib and provides:
+- Beautiful defaults out-of-the-box
+- Statistical plots (confidence intervals, KDE overlays) with one line
+- DataFrame-aware: pass column names directly
+- FacetGrid for multi-panel plots
+- Less code for the same output
+
+**When to use which:**
+- Seaborn for exploratory analysis and statistical visualization (default choice)
+- Matplotlib when you need fine-grained control: custom annotations, mixed chart types, exact pixel control, publication figures
+- They're complementary — use seaborn for the main chart, matplotlib for customization:
+
+seaborn creates matplotlib figures under the hood, so you can always access the underlying axes with plt.gca() to add matplotlib customizations on top of seaborn charts.`,code:`# Seaborn: beautiful statistical chart in 1 line
+sns.boxplot(x='dept', y='salary', hue='city', data=df)
+
+# Then use matplotlib to customize
+plt.title('Salary Distribution by Department', fontweight='bold')
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+# Access seaborn's underlying matplotlib axes
+ax = plt.gca()
+ax.set_xlabel('Department', fontsize=12)
+ax.spines['top'].set_visible(False)`}
+]}
+
+]; // end of SECTIONS
+
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let activeFilter = 'all';
+let searchVal = '';
+
+// ═══════════════════════════════════════════════════════════════════════
+// BUILD NAV
+// ═══════════════════════════════════════════════════════════════════════
+function buildNav() {
+  const nav = document.getElementById('sbNav');
+  const tabs = document.getElementById('topTabs');
+  const cats = {};
+  S.forEach(s => {
+    if (!cats[s.cat]) cats[s.cat] = [];
+    cats[s.cat].push(s);
+  });
+
+  Object.entries(cats).forEach(([cat, secs]) => {
+    const catEl = document.createElement('div');
+    catEl.className = 'sb-cat';
+    catEl.textContent = cat;
+    nav.appendChild(catEl);
+
+    secs.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'sb-item';
+      el.id = 'nav-' + s.id;
+      el.dataset.level = s.level;
+      el.dataset.tags = s.tags.join(',');
+      const colors = {beginner:'#10b981',intermediate:'#f59e0b',advanced:'#ef4444',numpy:'#7c3aed',viz:'#ec4899',interview:'#f97316'};
+      const dotColor = s.isInterview ? colors.interview : (s.tags.includes('numpy') ? colors.numpy : (s.tags.includes('viz') ? colors.viz : colors[s.level]));
+      el.innerHTML = `<span class="sb-dot" style="background:${dotColor}"></span>${s.icon} ${s.title}`;
+      el.onclick = () => goTo(s.id);
+      nav.appendChild(el);
+    });
+  });
+
+  // Top tab buttons
+  const catNames = Object.keys(cats);
+  catNames.forEach(cat => {
+    const t = document.createElement('div');
+    t.className = 'nav-tab';
+    t.textContent = cat;
+    t.onclick = () => goToSection(cats[cat][0].id);
+    tabs.appendChild(t);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BUILD CONTENT
+// ═══════════════════════════════════════════════════════════════════════
+function buildContent() {
+  const container = document.getElementById('content');
+
+  S.forEach(s => {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.id = 'sec-' + s.id;
+    sec.dataset.level = s.level;
+    sec.dataset.tags = s.tags.join(',');
+    sec.dataset.interview = s.isInterview ? '1' : '0';
+
+    const levelBadge = `<span class="badge badge-${s.level}">${s.level.charAt(0).toUpperCase()+s.level.slice(1)}</span>`;
+    const tagBadges = s.tags.filter(t => !['beginner','intermediate','advanced'].includes(t))
+      .map(t => `<span class="badge badge-${t}">${t==='de'?'Data Eng':t==='da'?'Analyst':t==='numpy'?'NumPy':t==='viz'?'Visualization':t==='interview'?'Interview':t}</span>`).join('');
+
+    if (s.isInterview) {
+      // Interview section — Q&A accordion
+      const qaHtml = s.qs.map((q, i) => {
+        const lvlColor = q.lvl === 'beginner' ? 'var(--beginner)' : q.lvl === 'intermediate' ? 'var(--intermediate)' : 'var(--advanced)';
+        const codeBlock = q.code ? `<div class="codeblock" style="border-radius:8px;overflow:hidden;margin-top:10px;"><pre>${q.code}</pre></div>` : '';
+        const ansHtml = q.a.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return `
+          <div class="qa-item">
+            <div class="qa-q" onclick="toggleQA(this)">
+              <div class="qa-q-text">${i+1}. ${q.q}</div>
+              <span class="qa-level" style="background:${lvlColor}22;color:${lvlColor}">${q.lvl}</span>
+              <span class="qa-toggle">+</span>
+            </div>
+            <div class="qa-a">${ansHtml}${codeBlock}</div>
+          </div>`;
+      }).join('');
+
+      sec.innerHTML = `
+        <div class="sec-header">
+          <div class="sec-icon">${s.icon}</div>
+          <div class="sec-info">
+            <div class="sec-title">${s.title}</div>
+            <div class="sec-desc">${s.desc}</div>
+            <div class="sec-badges">${levelBadge}${tagBadges}</div>
+          </div>
+        </div>
+        ${qaHtml}`;
+    } else {
+      // Normal code cards
+      const cardsHtml = s.cards.map(c => `
+        <div class="card">
+          <div class="card-hdr">
+            <div><div class="card-title">${c.t}</div><div class="card-sub">${c.d}</div></div>
+          </div>
+          <div class="codeblock">
+            <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+            <pre>${c.c}</pre>
+          </div>
+        </div>`).join('');
+
+      sec.innerHTML = `
+        <div class="sec-header">
+          <div class="sec-icon">${s.icon}</div>
+          <div class="sec-info">
+            <div class="sec-title">${s.title}</div>
+            <div class="sec-desc">${s.desc}</div>
+            <div class="sec-badges">${levelBadge}${tagBadges}</div>
+          </div>
+        </div>
+        ${cardsHtml}`;
+    }
+    container.appendChild(sec);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════════════════════════════
+function toggleQA(el) {
+  const ans = el.nextElementSibling;
+  const tog = el.querySelector('.qa-toggle');
+  const isOpen = ans.classList.contains('open');
+  ans.classList.toggle('open', !isOpen);
+  tog.textContent = isOpen ? '+' : '−';
+  tog.style.color = isOpen ? 'var(--text3)' : 'var(--interview)';
+}
+
+function copyCode(btn) {
+  const text = btn.nextElementSibling.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ DONE';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('done'); }, 2000);
+  });
+}
+
+function goTo(id) {
+  document.getElementById('sec-'+id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('nav-'+id)?.classList.add('active');
+  if (window.innerWidth <= 900) closeSidebar();
+}
+
+function goToSection(id) { goTo(id); }
+
+// ═══════════════════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════════════════
+document.getElementById('sbFilters').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  const f = chip.dataset.f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  chip.classList.add('on');
+  activeFilter = f;
+  applyFilters();
+});
+
+function doSearch(val) {
+  searchVal = val.toLowerCase();
+  applyFilters();
+}
+
+function applyFilters() {
+  S.forEach(s => {
+    const sec = document.getElementById('sec-'+s.id);
+    const nav = document.getElementById('nav-'+s.id);
+
+    const filterOk = activeFilter === 'all' ||
+      (activeFilter === 'interview' && s.isInterview) ||
+      (activeFilter === 'numpy' && s.tags.includes('numpy')) ||
+      (activeFilter === 'viz' && s.tags.includes('viz')) ||
+      (!['interview','numpy','viz'].includes(activeFilter) && s.level === activeFilter);
+
+    const searchOk = !searchVal ||
+      s.title.toLowerCase().includes(searchVal) ||
+      s.desc.toLowerCase().includes(searchVal) ||
+      (s.cards && s.cards.some(c => c.t.toLowerCase().includes(searchVal) || c.d.toLowerCase().includes(searchVal))) ||
+      (s.qs && s.qs.some(q => q.q.toLowerCase().includes(searchVal)));
+
+    const vis = filterOk && searchOk;
+    sec.style.display = vis ? '' : 'none';
+    nav.style.display = vis ? '' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SCROLL SPY + PROGRESS BAR
+// ═══════════════════════════════════════════════════════════════════════
+const mainEl = document.getElementById('main');
+mainEl.addEventListener('scroll', () => {
+  const st = mainEl.scrollTop;
+  const sh = mainEl.scrollHeight - mainEl.clientHeight;
+  document.getElementById('progress').style.width = (st/sh*100) + '%';
+
+  let active = null;
+  S.forEach(s => {
+    const el = document.getElementById('sec-'+s.id);
+    if (el && el.offsetTop - 80 <= st) active = s.id;
+  });
+  if (active) {
+    document.querySelectorAll('.sb-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('nav-'+active)?.classList.add('active');
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// MOBILE SIDEBAR
+// ═══════════════════════════════════════════════════════════════════════
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbBackdrop').classList.remove('on');
+}
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sbBackdrop').classList.toggle('on');
+});
+document.getElementById('sbBackdrop').addEventListener('click', closeSidebar);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+window.addEventListener('resize', () => { if (window.innerWidth > 900) closeSidebar(); });
+
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+buildNav();
+buildContent();
+</script>
+</body>
+</html>
